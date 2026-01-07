@@ -32,13 +32,13 @@ const router = createRouter({
     {
       path: '/admin',
       component: AdminLayout,
-      meta: { requiresAuth: true, role: 'Super Admin' },
+      meta: { requiresAuth: true, permission: 'app_mercadeo' },
       children: [
         {
           path: 'dashboard',
           name: 'dashboard',
           component: DashboardView,
-          meta: { title: 'Fabrica de Creditos' } // Ejemplo: si necesitara permiso, agregar permission: 'ver_dashboard'
+          meta: { title: 'Modulo Mercadeo' } // Ejemplo: si necesitara permiso, agregar permission: 'ver_dashboard'
         }
       ]
     },
@@ -83,6 +83,14 @@ router.beforeEach(async (to, from, next) => {
       }
     }
 
+
+    // Verificar Permiso
+    if (to.meta.permission && !authStore.can(to.meta.permission)) {
+      const motherAppUrl = import.meta.env.VITE_MOTHER_APP_URL || 'http://localhost:5173';
+      console.warn(`⛔ Acceso denegado: Usuario no tiene el permiso '${to.meta.permission}'. Redirigiendo a App Madre...`);
+      window.location.href = `${motherAppUrl}/apps`;
+      return;
+    }
 
     // Verificar Rol
     if (to.meta.role && !authStore.hasRole(to.meta.role)) {
