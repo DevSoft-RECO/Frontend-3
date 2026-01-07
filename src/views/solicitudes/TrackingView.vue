@@ -91,7 +91,7 @@
                     </div>
                      <div>
                         <span class="block text-gray-500 text-xs uppercase font-bold">Documento Adjunto</span>
-                        <a v-if="selectedItem?.path_documento_adjunto" :href="getFileUrl(selectedItem.path_documento_adjunto)" target="_blank" class="flex items-center gap-2 text-indigo-600 dark:text-indigo-400 hover:underline mt-1 bg-indigo-50 dark:bg-indigo-900/30 p-2 rounded">
+                        <a v-if="selectedItem?.path_documento_adjunto" @click.prevent="getFileUrl(selectedItem.id, 'adjunto')" href="#" class="flex items-center gap-2 text-indigo-600 dark:text-indigo-400 hover:underline mt-1 bg-indigo-50 dark:bg-indigo-900/30 p-2 rounded">
                             <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path></svg>
                             Ver PDF Original
                         </a>
@@ -237,11 +237,11 @@ const getStatusClass = (status) => {
            status === 'RECHAZADO' ? 'bg-red-100 text-red-800' : 'bg-gray-100'
 }
 
-const getFileUrl = (path) => {
-    if(!path) return '#'
-    // Ajustar URL base segun entorno
-    const baseUrl = 'http://localhost:8002/storage/'
-    return baseUrl + path
+const getFileUrl = async (id, type) => {
+    try {
+        const url = await store.getFileUrl(id, type)
+        if(url) window.open(url, '_blank')
+    } catch(e) { alert("Error al abrir archivo") }
 }
 
 const openModal = (item) => {
