@@ -188,6 +188,24 @@ const menuItems = [
         label: 'Dashboard',
         route: '/admin/dashboard',
         iconSvg: '<path stroke-linecap="round" stroke-linejoin="round" d="M3 12l2-2 7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2v10a1 1 0 01-1 1h-3m-4 0h4" />'
+    },
+    {
+        id: 'mis-solicitudes',
+        label: 'Mis Solicitudes',
+        iconSvg: '<path stroke-linecap="round" stroke-linejoin="round" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" />',
+        children: [
+            { label: 'Gestionar Mis Solicitudes', route: '/admin/solicitudes/crear' }, // Users create and view their timeline
+        ]
+    },
+    {
+        id: 'admin-solicitudes',
+        label: 'Adm. Solicitudes',
+        iconSvg: '<path stroke-linecap="round" stroke-linejoin="round" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />',
+        children: [
+            { label: 'Bandeja de Entrada', route: '/admin/solicitudes/seguimiento' }, // Admins manage requests
+            { label: 'Tipos de Apoyo', route: '/admin/solicitudes/tipos-apoyo' },
+            { label: 'Gestión Localidades', route: '/admin/localidades' }
+        ]
     }
 ]
 

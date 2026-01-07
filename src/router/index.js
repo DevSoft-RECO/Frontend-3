@@ -8,6 +8,9 @@ import AdminLayout from '@/layouts/AdminLayout.vue'
 import CallbackView from '@/views/CallbackView.vue'
 import DashboardView from '@/views/DashboardView.vue'
 import UnauthorizedView from '@/views/UnauthorizedView.vue'
+import CreateRequestView from '@/views/solicitudes/CreateRequestView.vue'
+import TrackingView from '@/views/solicitudes/TrackingView.vue'
+import EvidenceView from '@/views/solicitudes/EvidenceView.vue'
 
 const router = createRouter({
   history: createWebHistory(import.meta.env.BASE_URL),
@@ -39,6 +42,32 @@ const router = createRouter({
           name: 'dashboard',
           component: DashboardView,
           meta: { title: 'Modulo Mercadeo' } // Ejemplo: si necesitara permiso, agregar permission: 'ver_dashboard'
+        },
+        // RUTAS SOLICITUDES
+        {
+          path: 'solicitudes/crear',
+          name: 'solicitudes-crear',
+          component: CreateRequestView
+        },
+        {
+          path: 'solicitudes/seguimiento',
+          name: 'solicitudes-seguimiento',
+          component: TrackingView
+        },
+        {
+          path: 'solicitudes/evidencias',
+          name: 'solicitudes-evidencias',
+          component: EvidenceView
+        },
+        {
+          path: 'solicitudes/tipos-apoyo',
+          name: 'tipos-apoyo',
+          component: () => import('@/views/solicitudes/TiposApoyoView.vue')
+        },
+        {
+          path: 'localidades',
+          name: 'localidades',
+          component: () => import('@/views/solicitudes/LocalidadesView.vue')
         }
       ]
     },
