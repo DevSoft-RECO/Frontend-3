@@ -13,51 +13,50 @@
       </button>
     </div>
 
-    <!-- TABLA -->
-    <div class="bg-white dark:bg-gray-800 rounded-lg shadow overflow-hidden">
-      <table class="min-w-full divide-y divide-gray-200 dark:divide-gray-700">
-        <thead class="bg-gray-50 dark:bg-gray-900">
-            <tr>
-                <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">ID</th>
-                <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Fecha Evento</th>
-                <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Solicitante</th>
-                <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Estado</th>
-                <th class="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase tracking-wider">Acciones</th>
-            </tr>
-        </thead>
-        <tbody class="bg-white dark:bg-gray-800 divide-y divide-gray-200 dark:divide-gray-700">
-            <tr v-if="loading" class="text-center"><td colspan="5" class="py-4">Cargando...</td></tr>
-            <tr v-else-if="solicitudes.length === 0" class="text-center"><td colspan="5" class="py-4 text-gray-500">No hay solicitudes creadas</td></tr>
-            <tr v-for="solicitud in solicitudes" :key="solicitud.id" class="hover:bg-gray-50 dark:hover:bg-gray-700">
-                <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900 dark:text-gray-100">#{{ solicitud.id }}</td>
-                <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500 dark:text-gray-300">
-                    {{ new Date(solicitud.fecha_evento).toLocaleDateString() }}
-                </td>
-                <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900 dark:text-gray-100">{{ solicitud.nombre_solicitante }}</td>
-                <td class="px-6 py-4 whitespace-nowrap">
-                    <span :class="getStatusClass(solicitud.estado)" class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full">
-                        {{ solicitud.estado }}
-                    </span>
-                </td>
-                <td class="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
-                    <button
-                        @click="openTimeline(solicitud)"
-                        class="text-indigo-600 hover:text-indigo-900 dark:text-indigo-400 dark:hover:text-indigo-300 mr-3"
-                    >
-                        Ver Seguimiento
-                    </button>
-                    <button
-                        v-if="solicitud.estado === 'SOLICITADO'"
-                        @click="editSolicitud(solicitud)"
-                        class="text-gray-600 hover:text-gray-900 dark:text-gray-400 dark:hover:text-gray-300"
-                    >
-                        Editar
-                    </button>
-                </td>
-            </tr>
-        </tbody>
-      </table>
-    </div>
+    <!-- TABLA GLOBAL -->
+    <BaseTable
+        :columns="columns"
+        :rows="solicitudes"
+        :loading="loading"
+        :pagination="pagination"
+        @change-page="changePage"
+    >
+        <!-- CUSTOM CELL: ID (Optional overrides if needed, but default text is fine usually) -->
+        <template #cell-id="{ value }">
+            <span class="font-medium">#{{ value }}</span>
+        </template>
+
+        <!-- CUSTOM CELL: FECHA -->
+        <template #cell-fecha_evento="{ value }">
+            {{ new Date(value).toLocaleDateString() }}
+        </template>
+
+        <!-- CUSTOM CELL: ESTADO -->
+        <template #cell-estado="{ value }">
+             <span :class="getStatusClass(value)" class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full">
+                {{ value }}
+            </span>
+        </template>
+
+        <!-- ACTIONS -->
+        <template #cell-actions="{ row }">
+             <div class="flex justify-end items-center gap-2">
+                 <button
+                    @click="openTimeline(row)"
+                    class="text-indigo-600 hover:text-indigo-900 dark:text-indigo-400 dark:hover:text-indigo-300 text-sm font-medium"
+                >
+                    Ver Seguimiento
+                </button>
+                <button
+                    v-if="row.estado === 'SOLICITADO'"
+                    @click="editSolicitud(row)"
+                    class="text-gray-600 hover:text-gray-900 dark:text-gray-400 dark:hover:text-gray-300 text-sm font-medium"
+                >
+                    Editar
+                </button>
+             </div>
+        </template>
+    </BaseTable>
 
     <!-- MODAL FORMULARIO (Crear/Editar) -->
     <div v-if="showModal" class="fixed inset-0 z-50 flex items-center justify-center bg-black/50 p-4">
@@ -159,6 +158,7 @@ import { useSolicitudesStore } from '@/stores/solicitudes'
 import { useLocalidadesStore } from '@/stores/localidades'
 import { useAuthStore } from '@/stores/auth'
 import TimelineModal from './Seguimiento/TimelineModal.vue'
+import BaseTable from '@/components/ui/BaseTable.vue'
 
 const store = useSolicitudesStore()
 const localidadesStore = useLocalidadesStore()
@@ -175,6 +175,21 @@ const selectedRequest = ref(null)
 
 const selectedDepto = ref(null)
 const selectedMuni = ref(null)
+
+// DEFINICIÓN DE COLUMNAS
+const columns = [
+    { key: 'id', label: 'ID', truncate: true },
+    { key: 'fecha_evento', label: 'Fecha Evento', truncate: true },
+    { key: 'nombre_solicitante', label: 'Solicitante', truncate: true },
+    { key: 'estado', label: 'Estado', truncate: false },
+    { key: 'actions', label: 'Acciones', align: 'right', truncate: false }
+]
+
+// PAGINACIÓN
+const pagination = ref({
+    current_page: 1,
+    last_page: 1
+})
 
 const form = reactive({
     id: null,
@@ -215,13 +230,36 @@ const loadComunidades = async () => {
     if(selectedMuni.value) await localidadesStore.fetchComunidades(selectedMuni.value)
 }
 
-const loadData = async () => {
+const loadData = async (page = 1) => {
     loading.value = true
     try {
-        const res = await store.fetchSolicitudes()
-        solicitudes.value = res.data
+        const res = await store.fetchSolicitudes(page)
+
+        // Handle response with or without pagination
+        if (res.data && Array.isArray(res.data)) {
+             solicitudes.value = res.data
+             // Try to map pagination from common structures
+             if (res.meta) {
+                 pagination.value = {
+                     current_page: res.meta.current_page,
+                     last_page: res.meta.last_page
+                 }
+             } else if (res.current_page) {
+                 pagination.value = {
+                     current_page: res.current_page,
+                     last_page: res.last_page
+                 }
+             }
+        } else {
+             // Fallback
+             solicitudes.value = res.data || []
+        }
     } catch (e) { console.error(e) }
     finally { loading.value = false }
+}
+
+const changePage = (page) => {
+    loadData(page)
 }
 
 const getStatusClass = (status) => {
@@ -282,7 +320,7 @@ const submitForm = async () => {
             await store.createSolicitud(formData)
         }
         closeModal()
-        loadData()
+        loadData(isEditing.value ? pagination.value.current_page : 1)
     } catch (e) {
         alert("Error al guardar: " + (e.response?.data?.message || e.message))
     } finally {

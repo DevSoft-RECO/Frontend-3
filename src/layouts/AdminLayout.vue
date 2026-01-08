@@ -1,14 +1,38 @@
 <template>
-  <div class="flex h-screen bg-gray-50 dark:bg-gray-950 text-gray-800 dark:text-gray-100 font-sans overflow-hidden transition-colors duration-300">
+<div
+  class="relative flex h-screen
+         bg-gradient-to-br
+         from-gray-100 via-gray-200 to-gray-300
+         dark:from-[#0f172a] dark:via-[#020617] dark:to-black
+         text-gray-800 dark:text-gray-100
+         font-sans overflow-hidden transition-colors duration-300">
 
+  <!-- Mancha gris superior izquierda -->
+  <div
+    class="pointer-events-none absolute -top-40 -left-40 w-[700px] h-[700px]
+           rounded-full blur-3xl
+           bg-gray-700/25
+           dark:bg-gray-600/15">
+  </div>
+
+  <!-- Mancha gris inferior derecha -->
+  <div
+    class="pointer-events-none absolute -bottom-48 -right-48 w-[800px] h-[800px]
+           rounded-full blur-3xl
+           bg-gray-700/30
+           dark:bg-gray-500/10">
+  </div>
+
+
+
+    <!-- Sidebar -->
     <AdminSidebar />
 
-  <div
-    class="flex flex-col flex-1 h-full min-w-0 transition-all duration-300 ease-[cubic-bezier(0.25,0.8,0.25,1)]"
-    :class="[layoutStore.isCollapsed ? 'md:ml-24' : 'md:ml-[18rem]']"
-  >
-
-
+    <!-- Contenido -->
+    <div
+      class="flex flex-col flex-1 min-w-0"
+      :class="[layoutStore.isCollapsed ? 'md:ml-24' : 'md:ml-[18rem]']"
+    >
       <AdminHeader />
 
       <main class="flex-1 overflow-x-hidden overflow-y-auto p-6 relative custom-scrollbar">
@@ -29,6 +53,7 @@
     </div>
   </div>
 </template>
+
 
 <script setup>
 import { onMounted, onUnmounted } from 'vue' // Agregamos onUnmounted
@@ -51,30 +76,4 @@ onUnmounted(() => {
 })
 </script>
 
-<style>
-/* SCROLLBAR OPTIMIZADO PARA TAILWIND 4
-   Usamos variables CSS nativas que TW4 expone automáticamente.
-*/
-.custom-scrollbar::-webkit-scrollbar {
-  width: 6px;
-  height: 6px;
-}
-.custom-scrollbar::-webkit-scrollbar-track {
-  background: transparent;
-}
-.custom-scrollbar::-webkit-scrollbar-thumb {
-  background-color: var(--color-gray-300);
-  border-radius: 9999px;
-}
-.custom-scrollbar::-webkit-scrollbar-thumb:hover {
-  background-color: var(--color-gray-400);
-}
 
-/* Soporte Dark Mode */
-:root.dark .custom-scrollbar::-webkit-scrollbar-thumb {
-  background-color: var(--color-gray-700);
-}
-:root.dark .custom-scrollbar::-webkit-scrollbar-thumb:hover {
-  background-color: var(--color-gray-600);
-}
-</style>
