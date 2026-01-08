@@ -39,7 +39,7 @@
         </template>
 
         <template #cell-fecha_evento="{ value }">
-            <span class="dark:text-gray-300">{{ value }}</span>
+            <span class="dark:text-gray-300">{{ value ? new Date(value).toLocaleDateString() : '-' }}</span>
         </template>
 
         <template #cell-nombre_solicitante="{ value }">
