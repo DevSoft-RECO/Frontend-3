@@ -21,40 +21,43 @@
                  <option value="APROBADO">Aprobado</option>
              </select>
         </div>
-        <button @click="loadData" class="bg-indigo-600 text-white px-4 py-2 rounded-lg hover:bg-indigo-700 transition">
+        <button @click="loadData(1)" class="bg-indigo-600 text-white px-4 py-2 rounded-lg hover:bg-indigo-700 transition">
             Filtrar
         </button>
     </div>
 
-    <!-- TABLA -->
-    <div class="bg-white dark:bg-gray-800 rounded-lg shadow overflow-hidden">
-        <table class="min-w-full divide-y divide-gray-200 dark:divide-gray-700">
-            <thead class="bg-gray-50 dark:bg-gray-900">
-                <tr>
-                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">ID</th>
-                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Evento</th>
-                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Solicitante</th>
-                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Estado</th>
-                    <th class="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase">Acciones</th>
-                </tr>
-            </thead>
-            <tbody class="divide-y divide-gray-200 dark:divide-gray-700">
-                <tr v-for="req in requests" :key="req.id" class="hover:bg-gray-50 dark:hover:bg-gray-700">
-                    <td class="px-6 py-4 text-sm dark:text-white">#{{ req.id }}</td>
-                    <td class="px-6 py-4 text-sm dark:text-gray-300">{{ req.fecha_evento }}</td>
-                    <td class="px-6 py-4 text-sm dark:text-gray-300">{{ req.nombre_solicitante }}</td>
-                    <td class="px-6 py-4">
-                        <span :class="getStatusClass(req.estado)" class="px-2 text-xs font-semibold rounded-full">{{ req.estado }}</span>
-                    </td>
-                    <td class="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
-                         <button @click="openModal(req)" class="text-indigo-600 hover:text-indigo-900 dark:text-indigo-400 font-bold">
-                            {{ req.estado === 'SOLICITADO' ? 'Gestionar' : (req.estado === 'EN_GESTION' ? 'Aprobar/Revisar' : 'Ver Detalle') }}
-                         </button>
-                    </td>
-                </tr>
-            </tbody>
-        </table>
-    </div>
+    <!-- TABLA COMPONENTE -->
+    <BaseTable
+        :columns="columns"
+        :rows="requests"
+        :loading="loading"
+        :pagination="pagination"
+        @change-page="changePage"
+    >
+        <template #cell-id="{ value }">
+            <span class="font-medium dark:text-white">#{{ value }}</span>
+        </template>
+
+        <template #cell-fecha_evento="{ value }">
+            <span class="dark:text-gray-300">{{ value }}</span>
+        </template>
+
+        <template #cell-nombre_solicitante="{ value }">
+             <span class="dark:text-gray-300">{{ value }}</span>
+        </template>
+
+        <template #cell-estado="{ value }">
+             <span :class="getStatusClass(value)" class="px-2 text-xs font-semibold rounded-full">{{ value }}</span>
+        </template>
+
+        <template #cell-actions="{ row }">
+             <div class="flex justify-end">
+                 <button @click="openModal(row)" class="text-indigo-600 hover:text-indigo-900 dark:text-indigo-400 font-bold">
+                    {{ row.estado === 'SOLICITADO' ? 'Gestionar' : (row.estado === 'EN_GESTION' ? 'Aprobar/Revisar' : 'Ver Detalle') }}
+                 </button>
+             </div>
+        </template>
+    </BaseTable>
 
     <!-- MAIN ACTION MODAL -->
     <div v-if="showDetailModal" class="fixed inset-0 z-50 flex items-center justify-center bg-black/50 p-4">
@@ -182,7 +185,7 @@
         </div>
     </div>
 
-    <!-- MODAL RECHAZO (Nest or separate? Separate for cleanliness) -->
+    <!-- MODAL RECHAZO -->
     <div v-if="showRechazoModal" class="fixed inset-0 z-[60] flex items-center justify-center bg-black/60 p-4">
          <div class="bg-white dark:bg-gray-800 p-6 rounded-lg w-full max-w-sm shadow-2xl border-2 border-red-500">
             <h3 class="text-lg font-bold mb-4 text-red-600">Rechazar Solicitud</h3>
@@ -201,10 +204,26 @@
 <script setup>
 import { ref, onMounted, reactive } from 'vue'
 import { useSolicitudesStore } from '@/stores/solicitudes'
+import BaseTable from '@/components/ui/BaseTable.vue'
 
 const store = useSolicitudesStore()
 const requests = ref([])
 const filters = reactive({ fecha_inicio: '', fecha_fin: '', estado: '' })
+const loading = ref(false)
+
+// COLUMNAS BASE TABLE
+const columns = [
+    { key: 'id', label: 'ID', truncate: true },
+    { key: 'fecha_evento', label: 'Evento', truncate: true },
+    { key: 'nombre_solicitante', label: 'Solicitante', truncate: true },
+    { key: 'estado', label: 'Estado', truncate: false },
+    { key: 'actions', label: 'Acciones', align: 'right', truncate: false }
+]
+
+const pagination = ref({
+    current_page: 1,
+    last_page: 1
+})
 
 // Modal State
 const showDetailModal = ref(false)
@@ -222,11 +241,35 @@ onMounted(async () => {
     await store.fetchTiposApoyo() // Cargar catalogo
 })
 
-const loadData = async () => {
+const loadData = async (page = 1) => {
+    loading.value = true
     try {
-        const res = await store.fetchSolicitudes(filters)
-        requests.value = res.data // Paginado array
+        // Assuming filters is optional 2nd arg or merged
+        const res = await store.fetchSolicitudes({ ...filters, page })
+
+        if (res.data && Array.isArray(res.data)) {
+             requests.value = res.data
+             // Mapping pagination
+             if (res.meta) {
+                 pagination.value = {
+                     current_page: res.meta.current_page,
+                     last_page: res.meta.last_page
+                 }
+             } else if (res.current_page) {
+                 pagination.value = {
+                     current_page: res.current_page,
+                     last_page: res.last_page
+                 }
+             }
+        } else {
+             requests.value = res.data || []
+        }
     } catch(e) { console.error(e) }
+    finally { loading.value = false }
+}
+
+const changePage = (page) => {
+    loadData(page)
 }
 
 const getStatusClass = (status) => {
