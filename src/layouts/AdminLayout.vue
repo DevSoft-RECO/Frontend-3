@@ -1,18 +1,19 @@
 <template>
   <div class="flex h-screen bg-gray-50 dark:bg-gray-950 text-gray-800 dark:text-gray-100 font-sans overflow-hidden transition-colors duration-300">
-    
+
     <AdminSidebar />
 
-    <div 
-      class="flex flex-col flex-1 h-full transition-all duration-300 ease-[cubic-bezier(0.25,0.8,0.25,1)]"
-      :class="[layoutStore.isCollapsed ? 'md:ml-20' : 'md:ml-72']"
-    >
-      
+  <div
+    class="flex flex-col flex-1 h-full min-w-0 transition-all duration-300 ease-[cubic-bezier(0.25,0.8,0.25,1)]"
+    :class="[layoutStore.isCollapsed ? 'md:ml-24' : 'md:ml-[18rem]']"
+  >
+
+
       <AdminHeader />
 
       <main class="flex-1 overflow-x-hidden overflow-y-auto p-6 relative custom-scrollbar">
         <RouterView v-slot="{ Component }">
-          <Transition 
+          <Transition
             enter-active-class="transition ease-out duration-200"
             enter-from-class="opacity-0 translate-y-2"
             enter-to-class="opacity-100 translate-y-0"
@@ -39,7 +40,7 @@ const layoutStore = useLayoutStore()
 
 onMounted(() => {
   layoutStore.initTheme()
-  
+
   // Agregamos el "Listener" para detectar cuando el usuario divide la pantalla
   window.addEventListener('resize', layoutStore.handleResize)
 })
@@ -51,7 +52,7 @@ onUnmounted(() => {
 </script>
 
 <style>
-/* SCROLLBAR OPTIMIZADO PARA TAILWIND 4 
+/* SCROLLBAR OPTIMIZADO PARA TAILWIND 4
    Usamos variables CSS nativas que TW4 expone automáticamente.
 */
 .custom-scrollbar::-webkit-scrollbar {
