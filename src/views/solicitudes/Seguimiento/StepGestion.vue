@@ -5,7 +5,16 @@
         Gestión Administrativa
     </h3>
 
-    <div v-if="request.estado === 'SOLICITADO'" class="text-center py-8">
+    <div v-if="request.estado === 'RECHAZADO'" class="text-center py-8">
+        <div class="inline-block p-4 bg-red-50 rounded-full mb-3">
+             <svg class="w-8 h-8 text-red-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path></svg>
+        </div>
+        <h4 class="font-bold text-red-600 mb-1">Solicitud Rechazada</h4>
+        <p class="text-gray-600 dark:text-gray-300 text-sm">El proceso ha sido detenido.</p>
+        <p class="mt-4 text-red-800 bg-red-50 inline-block px-4 py-2 rounded text-base font-medium">Motivo: "{{ request.motivo_rechazo }}"</p>
+    </div>
+
+    <div v-else-if="request.estado === 'SOLICITADO'" class="text-center py-8">
         <div class="inline-block p-4 bg-yellow-50 rounded-full mb-3">
              <svg class="w-8 h-8 text-yellow-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
         </div>

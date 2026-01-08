@@ -115,8 +115,9 @@ const determineInitialStep = () => {
     const s = props.request?.estado
     if(s === 'SOLICITADO') activeStep.value = 1
     else if(s === 'EN_GESTION') activeStep.value = 2
-    else if(s === 'APROBADO') activeStep.value = 4 // Salta al 4 directo para que suba evidencias
+    else if(s === 'APROBADO') activeStep.value = 4
     else if(s === 'FINALIZADO') activeStep.value = 4
+    else if(s === 'RECHAZADO') activeStep.value = 2 // Muestra rechazo en Step 2 (Gestión)
     else activeStep.value = 1
 }
 
@@ -124,9 +125,9 @@ const maxAccessibleStep = computed(() => {
     const s = props.request?.estado
     if(s === 'SOLICITADO') return 1
     if(s === 'EN_GESTION') return 2
-    if(s === 'APROBADO') return 4 // Permitir ver hasta el 4 (Evidencias)
+    if(s === 'APROBADO') return 4
     if(s === 'FINALIZADO') return 4
-    if(s === 'RECHAZADO') return 4 // Permitir ver todo para ver donde fallo (o restringir si se prefiere)
+    if(s === 'RECHAZADO') return 2 // Detiene progreso en Step 2
     return 1
 })
 
