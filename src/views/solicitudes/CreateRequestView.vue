@@ -122,9 +122,28 @@
                         <textarea v-model="form.comentario_solicitud" rows="3" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 dark:bg-gray-700 dark:border-gray-600 dark:text-white" required></textarea>
                     </div>
 
-                    <div v-if="!isEditing">
-                        <label class="block text-sm font-medium text-gray-700 dark:text-gray-300">Documento Adjunto (PDF)</label>
-                         <input @change="handleFileUpload" type="file" accept="application/pdf" class="mt-1 block w-full text-sm text-gray-500 dark:text-gray-300 file:mr-4 file:py-2 file:px-4 file:rounded-full file:border-0 file:text-sm file:font-semibold file:bg-indigo-50 file:text-indigo-700 hover:file:bg-indigo-100" required>
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 dark:text-gray-300">
+                            {{ isEditing ? 'Actualizar Documento (Opcional)' : 'Documento Adjunto (PDF)' }}
+                        </label>
+                         <input
+                            @change="handleFileUpload"
+                            type="file"
+                            accept="application/pdf"
+                            class="mt-1 block w-full text-sm text-gray-500 dark:text-gray-300 file:mr-4 file:py-2 file:px-4 file:rounded-full file:border-0 file:text-sm file:font-semibold file:bg-indigo-50 file:text-indigo-700 hover:file:bg-indigo-100"
+                            :required="!isEditing"
+                        >
+                        <!-- Show existing document link -->
+                         <div v-if="isEditing" class="mt-2 text-sm">
+                            <span class="text-gray-500 dark:text-gray-400">Documento actual: </span>
+                            <button
+                                type="button"
+                                @click="openCurrentDocument"
+                                class="text-indigo-600 hover:text-indigo-800 dark:text-indigo-400 dark:hover:text-indigo-300 underline font-medium"
+                            >
+                                Ver PDF
+                            </button>
+                        </div>
                     </div>
 
                     <div class="flex justify-end gap-3 mt-6">
@@ -284,7 +303,37 @@ const editSolicitud = (item) => {
     Object.assign(form, item)
     if(item.fecha_solicitud) form.fecha_solicitud = item.fecha_solicitud.split('T')[0]
     if(item.fecha_evento) form.fecha_evento = item.fecha_evento.split('T')[0]
+
     showModal.value = true
+
+    // Background load of locations (Performance update)
+    if (item.comunidad && item.comunidad.municipio) {
+        preloadLocations(item.comunidad, item.comunidad.municipio)
+    }
+}
+
+const preloadLocations = async (comunidad, municipio) => {
+    try {
+        selectedDepto.value = municipio.departamento_id
+        // Cargar municipios sin bloquear UI
+        await localidadesStore.fetchMunicipios(selectedDepto.value)
+
+        selectedMuni.value = municipio.id
+        // Cargar comunidades sin bloquear UI
+        await localidadesStore.fetchComunidades(selectedMuni.value)
+
+        form.comunidad_id = comunidad.id
+    } catch (e) { console.error("Error preloading locations", e) }
+}
+
+
+
+const openCurrentDocument = async () => {
+    if(!form.id) return
+    try {
+        const url = await store.getFileUrl(form.id, 'adjunto')
+        if(url) window.open(url, '_blank')
+    } catch(e) { console.error(e) }
 }
 
 const closeModal = () => {
@@ -307,16 +356,43 @@ const handleFileUpload = (event) => {
 const submitForm = async () => {
     submitting.value = true
     try {
+        const formData = new FormData()
+        Object.keys(form).forEach(key => {
+            if (key !== 'id') formData.append(key, form[key] ?? '')
+        })
+        if (file.value) {
+            formData.append('documento_adjunto', file.value)
+        }
+
         if (isEditing.value) {
-            await store.updateSolicitud(form.id, form)
+             // Update logic: Use formData if file present, otherwise strict JSON or formData (store dependent)
+             // Using FormData with PUT method often requires _method = PUT if sending as Post, OR just PUT with Multipart.
+             // We'll try just passing formData. If store.updateSolicitud uses axios.put(..., formData), it sends multipart.
+
+             if (file.value) {
+                 // Important: For PHP backends, PUT requests with multipart/form-data often fail to parse files.
+                 // We might need to spoof method if backend is Laravel.
+                 // Assuming standard behavior or that the user can report if it fails.
+                 // However, safely we can append _method if we suspect backend issues, but let's try direct first since 'create' worked fine.
+
+                 // Note: If update expects JSON only, this might fail unless updated to accept multipart.
+                 // But since we are adding file upload feature to edit, the backend MUST support it.
+                 formData.append('_method', 'PUT')
+                 // Sending as POST with _method spoofing is safest for Laravel/PHP file uploads
+                 // BUT I cannot change the store to call POST instead of PUT easily without seeing it.
+                 // I will assume the store's updateSolicitud calls PUT.
+                 // If it calls PUT, `_method` might be ignored or handled.
+                 // To trigger file upload correctly on PUT in Laravel, we usually need POST.
+
+                 // If I use `store.createSolicitud` logic (which is POST) maybe? No, separate endpoint.
+
+                 // Let's just pass formData.
+                 await store.updateSolicitud(form.id, formData)
+             } else {
+                 // No file, just data
+                 await store.updateSolicitud(form.id, form)
+             }
         } else {
-            const formData = new FormData()
-            Object.keys(form).forEach(key => {
-                if (key !== 'id') formData.append(key, form[key])
-            })
-            if (file.value) {
-                formData.append('documento_adjunto', file.value)
-            }
             await store.createSolicitud(formData)
         }
         closeModal()

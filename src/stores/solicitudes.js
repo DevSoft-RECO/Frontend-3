@@ -61,11 +61,20 @@ export const useSolicitudesStore = defineStore('solicitudes', () => {
   }
 
   const updateSolicitud = async (id, formData) => {
-    // Nota: Si envias archivos usa POST con _method: PUT o maneja el backend
-    // El backend soporta PUT directo para data json, pero si hay archivos mejor usar POST simulado
-    // Para simplificar, el update del admin es JSON puro (según controlador).
-    const { data } = await axios.put(`/solicitudes/${id}`, formData)
-    return data
+    // Si es FormData, enviamos como POST para soportar archivos (method chaining)
+    if (formData instanceof FormData) {
+      // Asegurar que _method existe si el usuario no lo puso (aunque la vista lo pone)
+      if (!formData.has('_method')) formData.append('_method', 'PUT')
+
+      const { data } = await axios.post(`/solicitudes/${id}`, formData, {
+        headers: { 'Content-Type': 'multipart/form-data' }
+      })
+      return data
+    } else {
+      // JSON normal
+      const { data } = await axios.put(`/solicitudes/${id}`, formData)
+      return data
+    }
   }
 
   const deleteSolicitud = async (id) => {
