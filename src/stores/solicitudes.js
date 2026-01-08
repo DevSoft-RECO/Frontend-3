@@ -104,8 +104,13 @@ export const useSolicitudesStore = defineStore('solicitudes', () => {
   }
 
   const rechazarSolicitud = async (id, motivo) => {
-    const { data } = await axios.put(`/solicitudes/${id}/rechazar`, { motivo_rechazo: motivo })
-    return data
+    const res = await axios.put(`/solicitudes/${id}/rechazar`, { motivo_rechazo: motivo })
+    return res.data
+  }
+
+  const reactivarSolicitud = async (id) => {
+    const res = await axios.put(`/solicitudes/${id}/reactivar`)
+    return res.data
   }
 
   const getFileUrl = async (id, type) => {
@@ -133,6 +138,7 @@ export const useSolicitudesStore = defineStore('solicitudes', () => {
     aprobarSolicitud,
     finalizarSolicitud,
     rechazarSolicitud,
+    reactivarSolicitud,
     getFileUrl
   }
 })
