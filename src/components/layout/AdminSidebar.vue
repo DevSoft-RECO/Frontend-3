@@ -206,6 +206,15 @@ const menuItems = [
             { label: 'Tipos de Apoyo', route: '/admin/solicitudes/tipos-apoyo' },
             { label: 'Gestión Localidades', route: '/admin/localidades' }
         ]
+    },
+    {
+        id: 'facturas',
+        label: 'Facturas',
+        iconSvg: '<path stroke-linecap="round" stroke-linejoin="round" d="M9 7h6m0 4h6m-6 4h6M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z" />',
+        children: [
+            { label: 'Listado Facturas', route: '/admin/facturas/listado' },
+            { label: 'Categorías', route: '/admin/facturas/categorias' }
+        ]
     }
 ]
 

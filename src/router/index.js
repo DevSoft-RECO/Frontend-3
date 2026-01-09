@@ -68,6 +68,17 @@ const router = createRouter({
           path: 'localidades',
           name: 'localidades',
           component: () => import('@/views/solicitudes/LocalidadesView.vue')
+        },
+        // RUTAS FACTURAS
+        {
+          path: 'facturas/listado',
+          name: 'facturas-listado',
+          component: () => import('@/views/Facturas/FacturasView.vue')
+        },
+        {
+          path: 'facturas/categorias',
+          name: 'facturas-categorias',
+          component: () => import('@/views/Facturas/CategoriasView.vue')
         }
       ]
     },
