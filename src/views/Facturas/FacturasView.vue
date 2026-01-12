@@ -6,14 +6,14 @@
           <p class="text-sm text-gray-500">Gestión y control de facturas</p>
       </div>
       <div class="flex gap-2">
-           <a
-            :href="exportUrl"
-            target="_blank"
-            class="bg-green-600 hover:bg-green-700 text-white px-4 py-2 rounded-lg shadow transition flex items-center gap-2 text-sm font-medium"
+           <button
+            @click="downloadCsv"
+            :disabled="loading"
+            class="bg-green-600 hover:bg-green-700 text-white px-4 py-2 rounded-lg shadow transition flex items-center gap-2 text-sm font-medium disabled:opacity-50"
           >
             <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 10v6m0 0l-3-3m3 3l3-3M3 17V7a2 2 0 012-2h6l2 2h6a2 2 0 012 2v8a2 2 0 01-2 2H5a2 2 0 01-2-2z"></path></svg>
             Exportar CSV
-          </a>
+          </button>
           <button
             @click="openModal()"
             class="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-lg shadow transition flex items-center gap-2 text-sm font-medium"
@@ -138,7 +138,7 @@
 </template>
 
 <script setup>
-import { ref, onMounted, reactive, computed } from 'vue'
+import { ref, onMounted, reactive } from 'vue'
 import { useFacturasStore } from '@/stores/facturas'
 import BaseTable from '@/components/ui/BaseTable.vue'
 
@@ -183,11 +183,32 @@ const columns = [
     { key: 'actions', label: 'Acciones', align: 'right' }
 ]
 
-const exportUrl = computed(() => store.getExportUrl({
-    search: filters.numero,
-    fecha_inicio: filters.fecha_inicio,
-    fecha_fin: filters.fecha_fin
-}))
+const downloadCsv = async () => {
+    loading.value = true
+    try {
+        const params = {
+            search: filters.numero,
+            fecha_inicio: filters.fecha_inicio,
+            fecha_fin: filters.fecha_fin
+        }
+        const blob = await store.downloadFacturasCsv(params)
+
+        // Create invisible link to download blob
+        const url = window.URL.createObjectURL(new Blob([blob]))
+        const link = document.createElement('a')
+        link.href = url
+        link.setAttribute('download', `facturas_${new Date().toISOString().split('T')[0]}.csv`)
+        document.body.appendChild(link)
+        link.click()
+        link.remove()
+        window.URL.revokeObjectURL(url)
+    } catch (e) {
+        console.error(e)
+        alert('Error al descargar el archivo: ' + (e.message || 'Error desconocido'))
+    } finally {
+        loading.value = false
+    }
+}
 
 onMounted(async () => {
     loading.value = true

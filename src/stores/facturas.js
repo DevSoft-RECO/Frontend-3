@@ -50,7 +50,15 @@ export const useFacturasStore = defineStore('facturas', () => {
     const queryString = new URLSearchParams(params).toString()
     // Use environment variable directly or reconstruction
     const baseUrl = import.meta.env.VITE_API_URL || 'http://localhost:8002'
-    return `${baseUrl}/api/facturas/export/csv?${queryString}`
+    return `${baseUrl}/facturas/export/csv?${queryString}`
+  }
+
+  const downloadFacturasCsv = async (params = {}) => {
+    const res = await axios.get('/facturas/export/csv', {
+      params,
+      responseType: 'blob'
+    })
+    return res.data
   }
 
   return {
@@ -62,6 +70,7 @@ export const useFacturasStore = defineStore('facturas', () => {
     createFactura,
     updateFactura,
     deleteFactura,
-    getExportUrl
+    getExportUrl,
+    downloadFacturasCsv
   }
 })
