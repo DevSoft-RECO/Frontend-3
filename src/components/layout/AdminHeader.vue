@@ -61,12 +61,12 @@
             <img
                 v-if="userPhoto"
                 :src="userPhoto"
-                class="h-9 w-9 rounded-full object-cover border-2 border-[var(--color-verde-cope)]"
+                class="h-9 w-9 rounded-full object-cover border-2 border-emerald-500 shadow-[0_0_10px_rgba(34,197,94,0.3)]"
                 alt="Avatar"
             >
             <div
                 v-else
-                class="h-9 w-9 rounded-full bg-[var(--color-azul-cope)] text-white flex items-center justify-center font-bold text-sm border-2 border-[var(--color-verde-cope)]"
+                class="h-9 w-9 rounded-full bg-gray-800 text-emerald-500 flex items-center justify-center font-bold text-sm border-2 border-emerald-500 shadow-[0_0_10px_rgba(34,197,94,0.3)]"
             >
                 {{ userInitials }}
             </div>

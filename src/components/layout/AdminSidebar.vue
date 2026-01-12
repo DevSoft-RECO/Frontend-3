@@ -16,8 +16,7 @@
 
   <aside
     class="fixed inset-y-0 left-0 z-50 flex flex-col transition-all duration-300 shadow-2xl
-           bg-azul-cope dark:bg-gray-900
-           border-r border-transparent dark:border-gray-800"
+           bg-gray-900 border-r border-gray-800"
     :class="[
       layoutStore.isSidebarOpen ? 'translate-x-0' : '-translate-x-full md:translate-x-0',
       layoutStore.isCollapsed ? 'w-20' : 'w-72'
@@ -28,7 +27,7 @@
       <div v-if="!layoutStore.isCollapsed" class="flex items-center gap-3 fade-in w-full">
         <img src="@/assets/logoyk.svg" alt="YK" class="h-8 w-auto object-contain brightness-0 invert" />
         <span class="font-bold text-lg tracking-wider uppercase text-white dark:text-gray-100">
-            Yaman Kutx
+            Mercadeo
         </span>
       </div>
       <div v-else class="w-full flex justify-center fade-in">
@@ -46,16 +45,21 @@
             <RouterLink
             :to="item.route"
             @click="handleItemClick"
-            class="flex items-center px-3 py-3 rounded-lg transition-all duration-200 group border-l-4"
+            class="flex items-center px-3 py-3 rounded-lg transition-all duration-200 group relative overflow-hidden"
             :class="[
                 isActive(item.route)
-                ? 'bg-white/10 dark:bg-gray-800 border-verde-cope text-white dark:text-verde-cope shadow-lg'
-                : 'border-transparent text-gray-300 dark:text-gray-400 hover:bg-white/5 dark:hover:bg-gray-800 hover:text-white dark:hover:text-gray-100',
-                layoutStore.isCollapsed ? 'justify-center pl-0 border-l-0' : ''
+                ? 'bg-gray-800 text-white shadow-[0_0_15px_rgba(34,197,94,0.15)]' // Glow effect light
+                : 'text-gray-400 hover:bg-gray-800/50 hover:text-white',
+                layoutStore.isCollapsed ? 'justify-center' : ''
             ]"
             >
-                <span class="shrink-0 transition-colors duration-200"
-                      :class="isActive(item.route) ? 'text-verde-cope' : 'group-hover:text-verde-cope'">
+                <!-- Active Gradient Border -->
+                <div v-if="isActive(item.route) && !layoutStore.isCollapsed"
+                     class="absolute left-0 top-0 bottom-0 w-1 bg-gradient-to-b from-emerald-500 via-cyan-500 to-blue-500 shadow-[0_0_8px_#4ade80]"
+                ></div>
+
+                <span class="shrink-0 transition-colors duration-200 z-10"
+                      :class="isActive(item.route) ? 'text-emerald-400 drop-shadow-[0_0_5px_rgba(74,222,128,0.5)]' : 'group-hover:text-emerald-400'">
                     <svg v-html="item.iconSvg" class="w-6 h-6" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"></svg>
                 </span>
 
@@ -66,27 +70,28 @@
 
             <div
                 v-if="layoutStore.isCollapsed"
-                class="absolute left-full top-0 ml-2 px-3 py-2 bg-verde-cope text-white text-sm font-bold rounded-md shadow-xl opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-200 z-50 whitespace-nowrap pointer-events-none"
+                class="absolute left-full top-0 ml-2 px-3 py-2 bg-gray-800 border border-gray-700 text-white text-sm font-bold rounded-md shadow-xl opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-200 z-50 whitespace-nowrap pointer-events-none"
                 style="width: max-content;"
             >
                 {{ item.label }}
-                <div class="absolute top-3 -left-1 w-2 h-2 bg-verde-cope transform rotate-45"></div>
+                <!-- Arrow -->
+                <div class="absolute top-3 -left-1 w-2 h-2 bg-gray-800 border-l border-b border-gray-700 transform rotate-45"></div>
             </div>
         </div>
 
         <div v-else class="relative group">
             <button
                 @click="handleGroupClick(item.id)"
-                class="w-full flex items-center px-3 py-3 rounded-lg transition-all duration-200 group border-l-4 border-transparent"
+                class="w-full flex items-center px-3 py-3 rounded-lg transition-all duration-200 group relative"
                 :class="[
                     openGroups.includes(item.id) && !layoutStore.isCollapsed
-                    ? 'bg-black/20 dark:bg-black/40 text-white dark:text-gray-100'
-                    : 'text-gray-300 dark:text-gray-400 hover:bg-white/5 dark:hover:bg-gray-800 hover:text-white',
-                    layoutStore.isCollapsed ? 'justify-center pl-0' : 'justify-between'
+                    ? 'bg-gray-800 text-white'
+                    : 'text-gray-400 hover:bg-gray-800/50 hover:text-white',
+                    layoutStore.isCollapsed ? 'justify-center' : 'justify-between'
                 ]"
             >
                 <div class="flex items-center">
-                    <span class="shrink-0 transition-colors" :class="openGroups.includes(item.id) ? 'text-verde-cope' : 'group-hover:text-verde-cope'">
+                    <span class="shrink-0 transition-colors" :class="openGroups.includes(item.id) ? 'text-emerald-400' : 'group-hover:text-emerald-400'">
                         <svg v-html="item.iconSvg" class="w-6 h-6" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"></svg>
                     </span>
                     <span v-if="!layoutStore.isCollapsed" class="ml-3 font-medium truncate">{{ item.label }}</span>
@@ -95,7 +100,7 @@
                 <svg
                     v-if="!layoutStore.isCollapsed"
                     class="w-4 h-4 transition-transform duration-300"
-                    :class="openGroups.includes(item.id) ? 'text-verde-cope rotate-180' : 'text-gray-400'"
+                    :class="openGroups.includes(item.id) ? 'text-emerald-400 rotate-180' : 'text-gray-500'"
                     fill="none" viewBox="0 0 24 24" stroke="currentColor"
                 >
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7" />
@@ -104,9 +109,9 @@
 
             <div
                 v-if="layoutStore.isCollapsed"
-                class="absolute left-full top-0 ml-3 w-56 bg-azul-cope dark:bg-gray-800 border border-white/10 dark:border-gray-700 rounded-xl shadow-2xl opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-200 z-50 origin-top-left p-2 overflow-hidden"
+                class="absolute left-full top-0 ml-3 w-56 bg-gray-900 border border-gray-700 rounded-xl shadow-2xl opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-200 z-50 origin-top-left p-2 overflow-hidden"
             >
-                 <div class="px-3 py-2 text-xs font-bold text-verde-cope uppercase tracking-wider border-b border-white/10 dark:border-gray-700 mb-1">
+                 <div class="px-3 py-2 text-xs font-bold text-emerald-500 uppercase tracking-wider border-b border-gray-700 mb-1">
                     {{ item.label }}
                  </div>
 
@@ -117,13 +122,13 @@
                   @click="handleItemClick"
                   class="block px-3 py-2 rounded-lg text-sm transition-colors"
                   :class="isActive(child.route)
-                    ? 'bg-white/10 dark:bg-gray-700 text-white font-medium'
-                    : 'text-gray-300 dark:text-gray-400 hover:bg-white/5 dark:hover:bg-gray-700 hover:text-white'"
+                    ? 'bg-gray-800 text-emerald-400 font-medium'
+                    : 'text-gray-400 hover:bg-gray-800 hover:text-white'"
                 >
                   {{ child.label }}
                 </RouterLink>
 
-                 <div class="absolute top-4 -left-1.5 w-3 h-3 bg-azul-cope dark:bg-gray-800 border-l border-b border-white/10 dark:border-gray-700 transform rotate-45"></div>
+                 <div class="absolute top-4 -left-1.5 w-3 h-3 bg-gray-900 border-l border-b border-gray-700 transform rotate-45"></div>
             </div>
 
             <div
@@ -137,8 +142,8 @@
                     @click="handleItemClick"
                     class="block px-3 py-2 rounded-md text-sm transition-colors duration-200"
                     :class="isActive(child.route)
-                        ? 'text-verde-cope font-bold'
-                        : 'text-gray-400 dark:text-gray-500 hover:text-white dark:hover:text-gray-300'"
+                        ? 'text-emerald-400 font-bold drop-shadow-[0_0_5px_rgba(52,211,153,0.5)]'
+                        : 'text-gray-400 hover:text-white'"
                 >
                     {{ child.label }}
                 </RouterLink>
@@ -149,13 +154,13 @@
 
     <div class="p-4 mt-auto border-t border-white/10 dark:border-gray-800 shrink-0">
         <div v-if="!layoutStore.isCollapsed" class="fade-in text-center">
-            <p class="text-xs font-medium text-gray-400 dark:text-gray-500 mb-1">Desarrollado por</p>
-            <p class="text-xs font-bold text-white dark:text-gray-300 tracking-wide">
-                Área de Informática <span class="text-verde-cope">2025</span>
+            <p class="text-xs font-medium text-gray-500 mb-1">Desarrollado por</p>
+            <p class="text-xs font-bold text-gray-300 tracking-wide">
+                Área de Informática <span class="text-emerald-500">2025</span>
             </p>
         </div>
         <div v-else class="flex justify-center fade-in">
-            <svg class="w-5 h-5 text-gray-400 dark:text-gray-600 hover:text-verde-cope cursor-help" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <svg class="w-5 h-5 text-gray-500 hover:text-emerald-400 cursor-help" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 20l4-16m4 4l4 4-4 4M6 16l-4-4 4-4" />
             </svg>
         </div>
