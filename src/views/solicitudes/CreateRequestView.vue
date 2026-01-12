@@ -252,7 +252,8 @@ const loadComunidades = async () => {
 const loadData = async (page = 1) => {
     loading.value = true
     try {
-        const res = await store.fetchSolicitudes(page)
+        // We pass { page, own: 1 } to filter only my requests (even if admin)
+        const res = await store.fetchSolicitudes({ page, own: 1 })
 
         // Handle response with or without pagination
         if (res.data && Array.isArray(res.data)) {

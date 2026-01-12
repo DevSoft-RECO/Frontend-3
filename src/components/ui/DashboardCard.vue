@@ -1,6 +1,7 @@
 <template>
   <div
-    class="bg-white dark:bg-gray-800 rounded-xl shadow-sm border border-gray-200 dark:border-gray-700 p-4 transition-all hover:shadow-md cursor-pointer group"
+    class="bg-white dark:bg-gray-800 rounded-xl shadow-sm border border-gray-200 dark:border-gray-700 p-4 transition-all group"
+    :class="clickable ? 'hover:shadow-md cursor-pointer' : 'cursor-default'"
   >
     <div class="flex items-center justify-between mb-4">
       <div :class="`p-3 rounded-lg ${colorClasses}`">
@@ -28,6 +29,10 @@ const props = defineProps({
   color: {
     type: String,
     default: 'blue'
+  },
+  clickable: {
+    type: Boolean,
+    default: true
   }
 })
 

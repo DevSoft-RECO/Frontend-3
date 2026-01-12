@@ -31,6 +31,7 @@
               :count="stats?.SOLICITADO?.count || 0"
               icon="inbox"
               color="blue"
+              :clickable="canInteract"
               @click="openIdsModal('SOLICITADO', stats?.SOLICITADO?.ids)"
           />
           <!-- CARD: EN GESTION -->
@@ -39,6 +40,7 @@
               :count="stats?.EN_GESTION?.count || 0"
               icon="clock"
               color="yellow"
+              :clickable="canInteract"
               @click="openIdsModal('EN_GESTION', stats?.EN_GESTION?.ids)"
           />
           <!-- CARD: APROBADO -->
@@ -47,6 +49,7 @@
               :count="stats?.APROBADO?.count || 0"
               icon="check-circle"
               color="green"
+              :clickable="canInteract"
               @click="openIdsModal('APROBADO', stats?.APROBADO?.ids)"
           />
            <!-- CARD: FINALIZADO -->
@@ -55,6 +58,7 @@
               :count="stats?.FINALIZADO?.count || 0"
               icon="flag"
               color="gray"
+              :clickable="canInteract"
               @click="openIdsModal('FINALIZADO', stats?.FINALIZADO?.ids)"
           />
            <!-- CARD: DENEGADO (RECHAZADO internally) -->
@@ -63,6 +67,7 @@
               :count="stats?.RECHAZADO?.count || 0"
               icon="ban"
               color="red"
+              :clickable="canInteract"
               @click="openIdsModal('RECHAZADO', stats?.RECHAZADO?.ids)"
           />
       </div>
@@ -89,7 +94,8 @@
                   <div
                       v-for="event in upcomingEvents"
                       :key="event.id"
-                      class="flex items-center justify-between p-4 bg-gray-50 dark:bg-gray-700/50 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-700 transition cursor-pointer group"
+                      class="flex items-center justify-between p-4 bg-gray-50 dark:bg-gray-700/50 rounded-lg border border-gray-100 dark:border-gray-700 transition group"
+                      :class="canInteract ? 'hover:bg-gray-100 dark:hover:bg-gray-700 cursor-pointer' : 'cursor-default'"
                       @click="openEventDetail(event)"
                   >
                       <div class="flex items-center gap-4">
@@ -121,15 +127,27 @@
            <div class="bg-white dark:bg-gray-800 rounded-xl shadow-sm border border-gray-200 dark:border-gray-700 p-6">
               <h3 class="text-lg font-bold text-gray-800 dark:text-white mb-4">Accesos Directos</h3>
               <div class="space-y-3">
-                  <router-link to="/admin/solicitudes/crear" class="block w-full text-left p-3 rounded-lg bg-blue-50 text-blue-700 hover:bg-blue-100 dark:bg-blue-900/20 dark:text-blue-300 dark:hover:bg-blue-900/30 transition flex items-center gap-3">
+                  <router-link
+                      v-if="authStore.can('gestionar_solicitudes')"
+                      to="/admin/solicitudes/crear"
+                      class="block w-full text-left p-3 rounded-lg bg-blue-50 text-blue-700 hover:bg-blue-100 dark:bg-blue-900/20 dark:text-blue-300 dark:hover:bg-blue-900/30 transition flex items-center gap-3"
+                  >
                       <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"></path></svg>
                       <span>Nueva Solicitud</span>
                   </router-link>
-                   <router-link to="/admin/solicitudes/seguimiento" class="block w-full text-left p-3 rounded-lg bg-indigo-50 text-indigo-700 hover:bg-indigo-100 dark:bg-indigo-900/20 dark:text-indigo-300 dark:hover:bg-indigo-900/30 transition flex items-center gap-3">
+                   <router-link
+                      v-if="authStore.can('admin_mercadeo')"
+                      to="/admin/solicitudes/seguimiento"
+                      class="block w-full text-left p-3 rounded-lg bg-indigo-50 text-indigo-700 hover:bg-indigo-100 dark:bg-indigo-900/20 dark:text-indigo-300 dark:hover:bg-indigo-900/30 transition flex items-center gap-3"
+                  >
                       <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-3 7h3m-3 4h3m-6-4h.01M9 16h.01"></path></svg>
                       <span>Bandeja de Entrada</span>
                   </router-link>
-                  <router-link to="/admin/facturas/listado" class="block w-full text-left p-3 rounded-lg bg-green-50 text-green-700 hover:bg-green-100 dark:bg-green-900/20 dark:text-green-300 dark:hover:bg-green-900/30 transition flex items-center gap-3">
+                  <router-link
+                      v-if="authStore.can('admin_mercadeo')"
+                      to="/admin/facturas/listado"
+                      class="block w-full text-left p-3 rounded-lg bg-green-50 text-green-700 hover:bg-green-100 dark:bg-green-900/20 dark:text-green-300 dark:hover:bg-green-900/30 transition flex items-center gap-3"
+                  >
                       <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path></svg>
                       <span>Facturas</span>
                   </router-link>
@@ -198,8 +216,11 @@ const getStatusClass = (status) => {
             status === 'RECHAZADO' ? 'bg-red-100 text-red-800 dark:bg-red-900/30 dark:text-red-300' : 'bg-gray-100'
 }
 
+const canInteract = computed(() => authStore.can('dashboard_mercadeo'));
+
 // Actions
 const openIdsModal = (status, ids) => {
+    if (!canInteract.value) return; // Permission check
     modalTitle.value = status === 'RECHAZADO' ? 'DENEGADOS' : status.toLowerCase().replace('_', ' ')
     modalIds.value = ids || []
     showIdsModal.value = true
@@ -207,10 +228,11 @@ const openIdsModal = (status, ids) => {
 
 const goToDetail = () => {
     showIdsModal.value = false
-    router.push({ path: '/admin/solicitudes/seguimiento' })
+    router.push({ path: '/admin/solicitudes/seguimiento' }) // Accesible via direct link or standard nav
 }
 
 const openEventDetail = () => {
+    if (!canInteract.value) return; // Permission check
     // Redirect to TrackingView. User will search manually.
     router.push({ path: '/admin/solicitudes/seguimiento' })
 }

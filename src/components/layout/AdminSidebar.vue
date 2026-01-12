@@ -164,59 +164,72 @@
 </template>
 
 <script setup>
-import { ref } from 'vue'
+import { ref, computed } from 'vue'
 import { useRoute } from 'vue-router'
 import { useLayoutStore } from "@/stores/layout"
+import { useAuthStore } from "@/stores/auth"
 
 const route = useRoute()
 const layoutStore = useLayoutStore()
+const authStore = useAuthStore()
 const openGroups = ref([])
 
 // --- NUEVA FUNCIÓN PARA CERRAR EN MÓVIL ---
 const handleItemClick = () => {
-  // Verificamos si la pantalla es menor a 'md' (768px en Tailwind por defecto)
-  // O simplemente llamamos a closeSidebar. Tu CSS se encarga de que
-  // en escritorio no se oculte aunque isSidebarOpen sea false.
   if (window.innerWidth < 768) {
       layoutStore.closeSidebar()
   }
 }
 
-const menuItems = [
-    {
-        id: 'home',
-        label: 'Dashboard',
-        route: '/admin/dashboard',
-        iconSvg: '<path stroke-linecap="round" stroke-linejoin="round" d="M3 12l2-2 7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2v10a1 1 0 01-1 1h-3m-4 0h4" />'
-    },
-    {
-        id: 'mis-solicitudes',
-        label: 'Mis Solicitudes',
-        iconSvg: '<path stroke-linecap="round" stroke-linejoin="round" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" />',
-        children: [
-            { label: 'Gestionar Mis Solicitudes', route: '/admin/solicitudes/crear' }, // Users create and view their timeline
-        ]
-    },
-    {
-        id: 'admin-solicitudes',
-        label: 'Adm. Solicitudes',
-        iconSvg: '<path stroke-linecap="round" stroke-linejoin="round" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />',
-        children: [
-            { label: 'Bandeja de Entrada', route: '/admin/solicitudes/seguimiento' }, // Admins manage requests
-            { label: 'Tipos de Apoyo', route: '/admin/solicitudes/tipos-apoyo' },
-            { label: 'Gestión Localidades', route: '/admin/localidades' }
-        ]
-    },
-    {
-        id: 'facturas',
-        label: 'Facturas',
-        iconSvg: '<path stroke-linecap="round" stroke-linejoin="round" d="M9 7h6m0 4h6m-6 4h6M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z" />',
-        children: [
-            { label: 'Listado Facturas', route: '/admin/facturas/listado' },
-            { label: 'Categorías', route: '/admin/facturas/categorias' }
-        ]
+const menuItems = computed(() => {
+    const items = [
+        {
+            id: 'home',
+            label: 'Dashboard',
+            route: '/admin/dashboard',
+            iconSvg: '<path stroke-linecap="round" stroke-linejoin="round" d="M3 12l2-2 7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2v10a1 1 0 01-1 1h-3m-4 0h4" />'
+        }
+    ]
+
+    // Solo mostrar si tiene permiso
+    if (authStore.can('gestionar_solicitudes')) {
+        items.push({
+            id: 'mis-solicitudes',
+            label: 'Mis Solicitudes',
+            iconSvg: '<path stroke-linecap="round" stroke-linejoin="round" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" />',
+            children: [
+                { label: 'Gestionar Mis Solicitudes', route: '/admin/solicitudes/crear' },
+            ]
+        })
     }
-]
+
+    // Admin Group: Adm. Solicitudes y Facturas
+    // Solo visible si tiene permiso 'admin_mercadeo'
+    if (authStore.can('admin_mercadeo')) {
+        items.push({
+            id: 'admin-solicitudes',
+            label: 'Adm. Solicitudes',
+            iconSvg: '<path stroke-linecap="round" stroke-linejoin="round" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />',
+            children: [
+                { label: 'Bandeja de Entrada', route: '/admin/solicitudes/seguimiento' },
+                { label: 'Tipos de Apoyo', route: '/admin/solicitudes/tipos-apoyo' },
+                { label: 'Gestión Localidades', route: '/admin/localidades' }
+            ]
+        })
+
+        items.push({
+            id: 'facturas',
+            label: 'Facturas',
+            iconSvg: '<path stroke-linecap="round" stroke-linejoin="round" d="M9 7h6m0 4h6m-6 4h6M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z" />',
+            children: [
+                { label: 'Listado Facturas', route: '/admin/facturas/listado' },
+                { label: 'Categorías', route: '/admin/facturas/categorias' }
+            ]
+        })
+    }
+
+    return items
+})
 
 const isActive = (path) => route.path === path
 
