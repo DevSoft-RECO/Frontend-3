@@ -31,7 +31,7 @@
     <!-- Contenido -->
     <div
       class="flex flex-col flex-1 min-w-0"
-      :class="[layoutStore.isCollapsed ? 'md:ml-24' : 'md:ml-[18rem]']"
+      :class="[layoutStore.isCollapsed ? 'md:ml-20' : 'md:ml-[18rem]']"
     >
       <AdminHeader />
 
