@@ -184,7 +184,7 @@ const columns = [
 ]
 
 const exportUrl = computed(() => store.getExportUrl({
-    numero: filters.numero,
+    search: filters.numero,
     fecha_inicio: filters.fecha_inicio,
     fecha_fin: filters.fecha_fin
 }))
@@ -209,8 +209,7 @@ const loadData = async (page = 1) => {
     try {
         const params = {
             page,
-            numero: filters.numero,
-            serie: filters.numero, // Backend search logic maps 'numero' to both or specific
+            search: filters.numero,
             fecha_inicio: filters.fecha_inicio,
             fecha_fin: filters.fecha_fin
         }
