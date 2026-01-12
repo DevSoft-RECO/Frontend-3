@@ -10,6 +10,10 @@
           <div>
               <p class="font-bold">Solicitud Rechazada</p>
               <p>{{ request.motivo_rechazo }}</p>
+              <p class="text-xs mt-2 opacity-75" v-if="request.nombre_usuario_rechazo || request.fecha_rechazo">
+                  Rechazado por: <span class="font-bold">{{ request.nombre_usuario_rechazo || 'Desconocido' }}</span>
+                  el {{ formatDate(request.fecha_rechazo) }}
+              </p>
           </div>
           <button v-if="canManage" @click="reactivate" class="bg-indigo-600 text-white px-3 py-1 rounded text-xs hover:bg-indigo-700 shadow border border-indigo-500">
               Reactivar Solicitud
@@ -43,8 +47,11 @@
                    <p class="mt-1 text-gray-800 dark:text-white bg-white dark:bg-gray-800 p-3 rounded border dark:border-gray-700">
                        "{{ request.comentario_gestion }}"
                    </p>
-                   <p class="mt-2 text-xs text-gray-400">Iniciado el: {{ formatDate(request.fecha_inicio_gestion) }}</p>
-               </div>
+                    <p class="mt-2 text-xs text-gray-400">
+                        Iniciado por <span class="font-bold text-gray-600 dark:text-gray-300">{{ request.nombre_usuario_gestion || 'Desconocido' }}</span>
+                        el {{ formatDate(request.fecha_inicio_gestion) }}
+                    </p>
+                </div>
                <button v-if="canManage" @click="startEdit" class="text-xs text-blue-600 hover:underline">Editar</button>
            </div>
        </div>
@@ -98,7 +105,7 @@ const save = async () => {
             isEditing.value = false
             emit('refresh')
         } else {
-            await store.gestionarSolicitud(props.request.id, comment.value)
+            await store.gestionarSolicitud(props.request.id, comment.value, authStore.user?.name || 'Desconocido')
             emit('refresh')
             emit('next')
         }
@@ -109,7 +116,7 @@ const openRechazo = () => showRechazo.value = true
 const submitRechazo = async () => {
     if(!rechazoReason.value) return alert("Motivo requerido")
     try {
-        await store.rechazarSolicitud(props.request.id, rechazoReason.value)
+        await store.rechazarSolicitud(props.request.id, rechazoReason.value, authStore.user?.name || 'Desconocido')
         showRechazo.value = false
         emit('refresh')
     } catch(e) { alert("Error: " + e.message) }

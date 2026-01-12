@@ -45,7 +45,10 @@
                    <p><span class="font-bold text-gray-500">Tipo Apoyo:</span> {{ request.tipo_apoyo?.nombre || request.tipo_apoyo_id }}</p>
                    <p><span class="font-bold text-gray-500">Responsable:</span> {{ request.responsable_asignado }}</p>
                    <p><span class="font-bold text-gray-500">Monto:</span> Q{{ request.monto }}</p>
-                   <p><span class="font-bold text-gray-500">Fecha Aprobación:</span> {{ formatDate(request.fecha_aprobacion) }}</p>
+                   <p>
+                       <span class="font-bold text-gray-500">Aprobado por:</span> {{ request.nombre_usuario_aprobacion || 'Sistema' }}
+                       <span class="text-xs text-gray-400">({{ formatDate(request.fecha_aprobacion) }})</span>
+                   </p>
 
                    <button v-if="request.path_documento_firmado" @click="openDoc" class="text-green-600 hover:underline flex items-center gap-1 font-medium mt-1">
                         <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path></svg>
@@ -105,6 +108,7 @@ const save = async () => {
         formData.append('responsable_asignado', form.responsable_asignado)
         formData.append('monto', form.monto)
         if(file.value) formData.append('documento_firmado', file.value)
+        formData.append('nombre_usuario', authStore.user?.name || 'Desconocido')
 
         if(isEditing.value) {
             await store.updateSolicitud(props.request.id, formData)

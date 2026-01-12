@@ -33,32 +33,39 @@
       </div>
 
       <!-- VIEW HISTORY -->
-      <div v-else>
+      <div v-else-if="request.estado === 'FINALIZADO'">
            <div class="flex justify-between items-start">
                <div class="w-full">
                    <div class="grid grid-cols-2 gap-4 mt-2">
                        <div class="border rounded p-2 bg-white dark:bg-gray-800">
                            <p class="text-xs font-bold text-gray-500 mb-2">Evidencia Entrega</p>
                            <SecureImage
+                                v-if="request.path_foto_entrega"
                                 :id="request.id"
                                 type="entrega"
                                 imageClass="w-full h-32 object-cover rounded border hover:opacity-90 transition cursor-pointer"
                                 @click="openDoc('entrega')"
                            />
+                           <p v-else class="text-xs text-gray-400 italic">No disponible</p>
                        </div>
                        <div class="border rounded p-2 bg-white dark:bg-gray-800">
                            <p class="text-xs font-bold text-gray-500 mb-2">Evidencia Conocimiento</p>
                            <SecureImage
+                                v-if="request.path_foto_conocimiento"
                                 :id="request.id"
                                 type="conocimiento"
                                 imageClass="w-full h-32 object-cover rounded border hover:opacity-90 transition cursor-pointer"
                                 @click="openDoc('conocimiento')"
                            />
+                           <p v-else class="text-xs text-gray-400 italic">No disponible</p>
                        </div>
                    </div>
                </div>
                <button v-if="canManage" @click="isEditing = true" class="text-xs text-purple-600 hover:underline ml-4 mt-2">Editar</button>
            </div>
+      </div>
+      <div v-else class="text-sm text-gray-500 italic p-4">
+        Esperando Aprobación para subir evidencias.
       </div>
   </div>
 </template>

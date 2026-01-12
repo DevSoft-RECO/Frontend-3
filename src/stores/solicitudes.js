@@ -84,12 +84,16 @@ export const useSolicitudesStore = defineStore('solicitudes', () => {
   }
 
   // 3. Workflow Actions
-  const gestionarSolicitud = async (id, comentario) => {
-    const { data } = await axios.put(`/solicitudes/${id}/gestionar`, { comentario_gestion: comentario })
+  const gestionarSolicitud = async (id, comentario, userName) => {
+    const { data } = await axios.put(`/solicitudes/${id}/gestionar`, {
+      comentario_gestion: comentario,
+      nombre_usuario: userName
+    })
     return data
   }
 
   const aprobarSolicitud = async (id, formData) => {
+    // Nota: formData ya debe incluir 'nombre_usuario' si se agregó en la vista
     const { data } = await axios.post(`/solicitudes/${id}/aprobar`, formData, {
       headers: { 'Content-Type': 'multipart/form-data' }
     })
@@ -103,8 +107,11 @@ export const useSolicitudesStore = defineStore('solicitudes', () => {
     return data
   }
 
-  const rechazarSolicitud = async (id, motivo) => {
-    const res = await axios.put(`/solicitudes/${id}/rechazar`, { motivo_rechazo: motivo })
+  const rechazarSolicitud = async (id, motivo, userName) => {
+    const res = await axios.put(`/solicitudes/${id}/rechazar`, {
+      motivo_rechazo: motivo,
+      nombre_usuario: userName
+    })
     return res.data
   }
 

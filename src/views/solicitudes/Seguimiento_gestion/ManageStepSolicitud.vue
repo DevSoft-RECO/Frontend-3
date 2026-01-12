@@ -40,6 +40,10 @@
             <p class="text-gray-500 font-bold uppercase text-xs mb-1">Fecha Evento</p>
             <p class="dark:text-white font-medium text-base">{{ formatDate(request.fecha_evento) }}</p>
         </div>
+        <div>
+            <p class="text-gray-500 font-bold uppercase text-xs mb-1">Agencia (ID)</p>
+            <p class="dark:text-white font-medium text-base">{{ request.agencia_id || 'N/A' }}</p>
+        </div>
         <div class="col-span-1 md:col-span-2">
             <p class="text-gray-500 font-bold uppercase text-xs mb-1">Comentario</p>
             <div class="bg-white dark:bg-gray-800 p-4 rounded border border-gray-200 dark:border-gray-700 italic text-gray-600 dark:text-gray-300">
