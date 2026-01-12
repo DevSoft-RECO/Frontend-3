@@ -34,7 +34,7 @@
         <!-- CUSTOM CELL: ESTADO -->
         <template #cell-estado="{ value }">
              <span :class="getStatusClass(value)" class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full">
-                {{ value }}
+                {{ value === 'RECHAZADO' ? 'DENEGADO' : value }}
             </span>
         </template>
 

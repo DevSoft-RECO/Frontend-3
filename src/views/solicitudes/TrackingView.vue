@@ -20,7 +20,7 @@
                  <option value="EN_GESTION">En Gestión</option>
                  <option value="APROBADO">Aprobado</option>
                  <option value="FINALIZADO">Finalizado</option>
-                 <option value="RECHAZADO">Rechazado</option>
+                 <option value="RECHAZADO">Denegado</option>
              </select>
         </div>
         <button @click="loadData(1)" class="bg-indigo-600 text-white px-4 py-2 rounded-lg hover:bg-indigo-700 transition">
@@ -49,7 +49,7 @@
         </template>
 
         <template #cell-estado="{ value }">
-             <span :class="getStatusClass(value)" class="px-2 text-xs font-semibold rounded-full">{{ value }}</span>
+             <span :class="getStatusClass(value)" class="px-2 text-xs font-semibold rounded-full">{{ value === 'RECHAZADO' ? 'DENEGADO' : value }}</span>
         </template>
 
         <template #cell-actions="{ row }">

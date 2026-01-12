@@ -61,11 +61,11 @@
 
     <!-- CASO 3: RECHAZADO -->
     <div v-else-if="request.estado === 'RECHAZADO'" class="text-center py-8">
-         <div class="inline-block p-4 bg-red-50 rounded-full mb-3">
-             <svg class="w-8 h-8 text-red-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path></svg>
+        <div class="mb-4">
+            <span class="text-4xl">🚫</span>
         </div>
-        <h4 class="font-bold text-red-600 mb-1">Solicitud Rechazada</h4>
-        <p class="text-gray-600 dark:text-gray-300 text-sm">El proceso se detuvo porque la solicitud fue rechazada.</p>
+        <h4 class="font-bold text-red-600 mb-1">Solicitud Denegada</h4>
+        <p class="text-gray-600 dark:text-gray-300 text-sm">El proceso se detuvo porque la solicitud fue denegada.</p>
         <p class="mt-2 text-red-800 bg-red-50 inline-block px-3 py-1 rounded text-sm font-medium">Motivo: {{ request.motivo_rechazo }}</p>
     </div>
 

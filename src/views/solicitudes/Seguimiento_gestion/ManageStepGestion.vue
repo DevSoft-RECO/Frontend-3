@@ -8,10 +8,13 @@
       <!-- REJECTED STATE -->
       <div v-if="request.estado === 'RECHAZADO'" class="bg-red-100 dark:bg-red-900/30 p-4 rounded text-red-800 dark:text-red-200 flex justify-between items-center">
           <div>
-              <p class="font-bold">Solicitud Rechazada</p>
-              <p>{{ request.motivo_rechazo }}</p>
+              <p class="font-bold">Solicitud Denegada</p>
+              <div class="text-sm">
+                  <p class="font-bold">{{ formatDate(request.updated_at) }}</p>
+                  Denegado por: <span class="font-bold">{{ request.nombre_usuario_rechazo || 'Desconocido' }}</span>
+              </div>
               <p class="text-xs mt-2 opacity-75" v-if="request.nombre_usuario_rechazo || request.fecha_rechazo">
-                  Rechazado por: <span class="font-bold">{{ request.nombre_usuario_rechazo || 'Desconocido' }}</span>
+                  Denegado por: <span class="font-bold">{{ request.nombre_usuario_rechazo || 'Desconocido' }}</span>
                   el {{ formatDate(request.fecha_rechazo) }}
               </p>
           </div>
@@ -26,13 +29,13 @@
             {{ isEditing ? 'Editar Comentario de Gestión' : 'Ingrese el comentario para iniciar la gestión:' }}
           </p>
           <p v-if="!isEditing" class="text-xs text-gray-500 mb-2 italic">
-              (Nota: Si va a rechazar la solicitud, puede dejar este campo vacío. Se solicitará el motivo en la siguiente ventana).
+              (Nota: Si va a denegar la solicitud, puede dejar este campo vacío. Se solicitará el motivo en la siguiente ventana).
           </p>
           <textarea v-model="comment" class="w-full border rounded p-3 dark:bg-gray-700 dark:text-white" rows="3"></textarea>
 
           <div class="flex justify-end mt-4 gap-2">
                <button v-if="isEditing" @click="isEditing = false" class="px-4 py-2 text-gray-500">Cancelar</button>
-               <button v-if="!isEditing" @click="openRechazo" class="px-4 py-2 text-red-600 font-bold border border-red-200 rounded hover:bg-red-50">Rechazar</button>
+               <button v-if="!isEditing" @click="openRechazo" class="px-4 py-2 text-red-600 font-bold border border-red-200 rounded hover:bg-red-50">Denegar</button>
                <button @click="save" class="bg-blue-600 text-white px-6 py-2 rounded hover:bg-blue-700 shadow">
                    {{ isEditing ? 'Guardar Cambios' : 'Iniciar Gestión' }}
                </button>
@@ -59,11 +62,11 @@
        <!-- Modal Rechazo Local -->
        <div v-if="showRechazo" class="fixed inset-0 z-[60] flex items-center justify-center bg-black/50 p-4">
            <div class="bg-white p-6 rounded w-full max-w-sm">
-               <h3 class="text-red-600 font-bold mb-2">Rechazar Solicitud</h3>
-               <textarea v-model="rechazoReason" class="w-full border rounded p-2" placeholder="Motivo..."></textarea>
-               <div class="flex justify-end gap-2 mt-4">
-                   <button @click="showRechazo = false" class="px-3 py-1 border rounded">Cancelar</button>
-                   <button @click="submitRechazo" class="px-3 py-1 bg-red-600 text-white rounded">Confirmar</button>
+               <p class="text-sm text-gray-600 mb-4">Por favor, indique el motivo por el cual deniega esta solicitud.</p>
+               <textarea v-model="rechazoReason" class="w-full border rounded p-2 mb-4" rows="3" placeholder="Motivo..."></textarea>
+               <div class="flex justify-end gap-2">
+                   <button @click="showRechazo = false" class="px-4 py-2 text-gray-600 hover:bg-gray-100 rounded">Cancelar</button>
+                   <button @click="submitRechazo" class="px-4 py-2 bg-red-600 text-white rounded hover:bg-red-700">Confirmar Denegación</button>
                </div>
            </div>
        </div>
