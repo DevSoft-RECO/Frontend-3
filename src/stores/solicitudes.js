@@ -11,9 +11,6 @@ export const useSolicitudesStore = defineStore('solicitudes', () => {
 
   // Catalogos
   const tiposApoyo = ref([])
-  const departamentos = ref([])
-  const municipios = ref([])
-  const comunidades = ref([])
 
   // --- ACTIONS ---
 
@@ -34,6 +31,19 @@ export const useSolicitudesStore = defineStore('solicitudes', () => {
     const { data } = await axios.post('/tipos-apoyo', { nombre, activo: true })
     tiposApoyo.value.push(data)
     return data
+  }
+
+  const updateTipoApoyoAction = async (id, nombre, activo = true) => {
+    // Action: Update Tipo Apoyo
+    const { data } = await axios.put(`/tipos-apoyo/${id}`, { nombre, activo })
+    const idx = tiposApoyo.value.findIndex(t => t.id === id)
+    if (idx !== -1) tiposApoyo.value[idx] = data
+    return data
+  }
+
+  const deleteTipoApoyo = async (id) => {
+    await axios.delete(`/tipos-apoyo/${id}`)
+    tiposApoyo.value = tiposApoyo.value.filter(t => t.id !== id)
   }
 
 
@@ -146,6 +156,8 @@ export const useSolicitudesStore = defineStore('solicitudes', () => {
     finalizarSolicitud,
     rechazarSolicitud,
     reactivarSolicitud,
-    getFileUrl
+    getFileUrl,
+    updateTipoApoyoAction,
+    deleteTipoApoyo
   }
 })
