@@ -4,6 +4,17 @@
 
     <!-- FILTROS -->
     <div class="bg-white dark:bg-gray-800 p-4 rounded-lg shadow mb-6 flex flex-wrap gap-4 items-end">
+        <div class="w-full md:w-auto">
+            <label class="block text-sm font-medium text-gray-700 dark:text-gray-300">Buscar por ID</label>
+            <div class="flex gap-2">
+                <input v-model="filters.id" type="number" placeholder="#" class="mt-1 block w-24 rounded-md border-gray-300 dark:bg-gray-700 dark:text-white" @keyup.enter="loadData(1)">
+                <button @click="loadData(1)" class="mt-1 bg-gray-100 dark:bg-gray-700 hover:bg-gray-200 dark:hover:bg-gray-600 p-2 rounded text-gray-600 dark:text-gray-300 transition" title="Buscar ID">
+                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path></svg>
+                </button>
+            </div>
+        </div>
+        <div class="hidden md:block w-px bg-gray-300 h-10 mx-2"></div>
+
         <div>
             <label class="block text-sm font-medium text-gray-700 dark:text-gray-300">De fecha evento</label>
             <input v-model="filters.fecha_inicio" type="date" class="mt-1 block w-full rounded-md border-gray-300 dark:bg-gray-700 dark:text-white">
@@ -80,7 +91,7 @@ import ManagementModal from './Seguimiento_gestion/ManagementModal.vue'
 
 const store = useSolicitudesStore()
 const requests = ref([])
-const filters = reactive({ fecha_inicio: '', fecha_fin: '', estado: '' })
+const filters = reactive({ id: '', fecha_inicio: '', fecha_fin: '', estado: '' })
 const loading = ref(false)
 
 // COLUMNAS BASE TABLE
@@ -102,7 +113,7 @@ const showManagementModal = ref(false)
 const selectedItem = ref(null)
 
 onMounted(async () => {
-    loadData()
+    await loadData()
 })
 
 const loadData = async (page = 1) => {

@@ -63,6 +63,19 @@ export const useSolicitudesStore = defineStore('solicitudes', () => {
     }
   }
 
+  const getSolicitud = async (id) => {
+    loading.value = true
+    try {
+      const { data } = await axios.get(`/solicitudes/${id}`)
+      return data
+    } catch (err) {
+      error.value = err.response?.data?.message || 'Error al cargar solicitud'
+      throw err
+    } finally {
+      loading.value = false
+    }
+  }
+
   const createSolicitud = async (formData) => {
     const { data } = await axios.post('/solicitudes', formData, {
       headers: { 'Content-Type': 'multipart/form-data' }
@@ -148,6 +161,7 @@ export const useSolicitudesStore = defineStore('solicitudes', () => {
     fetchTiposApoyo,
     createTipoApoyo,
     fetchSolicitudes,
+    getSolicitud,
     createSolicitud,
     updateSolicitud,
     deleteSolicitud,
