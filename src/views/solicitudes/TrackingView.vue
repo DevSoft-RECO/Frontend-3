@@ -85,7 +85,7 @@
         :show="showManagementModal"
         :request="selectedItem"
         @close="closeModal"
-        @refresh="loadData"
+        @refresh="handleModalRefresh"
     />
 
   </div>
@@ -166,6 +166,10 @@ const changePage = (page) => { loadData(page) }
 
 const refreshData = () => {
     loadData(pagination.value.current_page || 1, true) // Force refresh
+}
+
+const handleModalRefresh = () => {
+    loadData(pagination.value.current_page || 1, true)
 }
 
 const getStatusClass = (status) => {
