@@ -88,8 +88,8 @@ const fileEntrega = ref(null)
 const fileConocimiento = ref(null)
 
 const isSuperAdmin = computed(() => authStore.hasRole('Super Admin'))
-const canManage = computed(() => isSuperAdmin.value) // Step 4 edits usually admin only or specific role
-const isPending = computed(() => props.request.estado === 'APROBADO' || (props.request.estado === 'FINALIZADO' && false))
+const canManage = computed(() => isSuperAdmin.value || authStore.can('gestionar_solicitudes'))
+const isPending = computed(() => props.request.estado === 'APROBADO' && canManage.value)
 // If Aprobado -> Pending Finalization. If Finalized -> Not Pending (History).
 
 const handleFileEntrega = (e) => fileEntrega.value = e.target.files[0]

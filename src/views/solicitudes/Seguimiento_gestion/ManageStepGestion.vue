@@ -18,7 +18,7 @@
                   el {{ formatDate(request.fecha_rechazo) }}
               </p>
           </div>
-          <button v-if="canManage" @click="reactivate" class="bg-indigo-600 text-white px-3 py-1 rounded text-xs hover:bg-indigo-700 shadow border border-indigo-500">
+          <button v-if="canEditHistory" @click="reactivate" class="bg-indigo-600 text-white px-3 py-1 rounded text-xs hover:bg-indigo-700 shadow border border-indigo-500">
               Reactivar Solicitud
           </button>
       </div>
@@ -55,7 +55,7 @@
                         el {{ formatDate(request.fecha_inicio_gestion) }}
                     </p>
                 </div>
-               <button v-if="canManage" @click="startEdit" class="text-xs text-blue-600 hover:underline">Editar</button>
+               <button v-if="canEditHistory" @click="startEdit" class="text-xs text-blue-600 hover:underline">Editar</button>
            </div>
        </div>
 
@@ -90,7 +90,8 @@ const showRechazo = ref(false)
 const rechazoReason = ref('')
 
 const isSuperAdmin = computed(() => authStore.hasRole('Super Admin'))
-const canManage = computed(() => isSuperAdmin.value || authStore.can('editar_gestiones'))
+const canManage = computed(() => isSuperAdmin.value || authStore.can('admin_mercadeo'))
+const canEditHistory = computed(() => isSuperAdmin.value)
 const isPending = computed(() => props.request.estado === 'SOLICITADO' && canManage.value)
 
 const formatDate = (d) => d ? new Date(d).toLocaleDateString() : '-'

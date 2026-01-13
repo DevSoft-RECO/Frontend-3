@@ -194,7 +194,7 @@ const menuItems = computed(() => {
     ]
 
     // Solo mostrar si tiene permiso
-    if (authStore.can('gestionar_solicitudes')) {
+    if (authStore.can('gestionar_solicitudes') || authStore.can('admin_mercadeo')) {
         items.push({
             id: 'mis-solicitudes',
             label: 'Mis Solicitudes',

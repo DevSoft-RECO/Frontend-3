@@ -55,7 +55,7 @@
                         Ver Documento Firmado
                    </button>
                </div>
-               <button v-if="canManage" @click="startEdit" class="text-xs text-green-600 hover:underline">Editar</button>
+               <button v-if="canEditHistory" @click="startEdit" class="text-xs text-green-600 hover:underline">Editar</button>
            </div>
       </div>
   </div>
@@ -78,7 +78,8 @@ const file = ref(null)
 const form = reactive({ tipo_apoyo_id: '', responsable_asignado: '', monto: '' })
 
 const isSuperAdmin = computed(() => authStore.hasRole('Super Admin'))
-const canManage = computed(() => isSuperAdmin.value || authStore.can('editar_gestiones'))
+const canManage = computed(() => isSuperAdmin.value || authStore.can('admin_mercadeo'))
+const canEditHistory = computed(() => isSuperAdmin.value)
 const isPending = computed(() => props.request.estado === 'EN_GESTION' && canManage.value)
 
 onMounted(() => {
