@@ -9,6 +9,11 @@ export const useSolicitudesStore = defineStore('solicitudes', () => {
   const loading = ref(false)
   const error = ref(null)
 
+  // Cache management (Map for multiple filter states)
+  // Key: JSON.stringify(filters), Value: { data, meta, timestamp }
+  const requestCache = new Map()
+  const CACHE_DURATION = 10 * 60 * 1000 // 10 minutes
+
   // Catalogos
   const tiposApoyo = ref([])
 
@@ -47,12 +52,62 @@ export const useSolicitudesStore = defineStore('solicitudes', () => {
   }
 
 
+  // Helper for stable cache keys (sorts object keys)
+  const stableStringify = (obj) => {
+    if (typeof obj !== 'object' || obj === null) return String(obj)
+    return JSON.stringify(Object.keys(obj).sort().reduce((result, key) => {
+      result[key] = obj[key]
+      return result
+    }, {}))
+  }
+
   // 2. CRUD Solicitudes
-  const fetchSolicitudes = async (filters = {}) => {
+  const fetchSolicitudes = async (filters = {}, forceRefresh = false) => {
+    // Create a cache key based on filters using stable stringify
+    const cacheKey = stableStringify(filters)
+
+    // Check if we have valid cached data for THIS specific filter set
+    const now = Date.now()
+
+    if (!forceRefresh && requestCache.has(cacheKey)) {
+      const cachedEntry = requestCache.get(cacheKey)
+      if ((now - cachedEntry.timestamp) < CACHE_DURATION) {
+        console.log('📦 [CACHE HIT] Solicitudes:', cacheKey)
+        return {
+          data: cachedEntry.data,
+          ...cachedEntry.pagination
+        }
+      } else {
+        console.log('⌛ [CACHE EXPIRED] Solicitudes:', cacheKey)
+        requestCache.delete(cacheKey)
+      }
+    } else {
+      if (forceRefresh) console.log('🔄 [FORCE REFRESH] Solicitudes')
+    }
+
+    console.log('🌐 [API FETCH] Solicitudes:', cacheKey)
     loading.value = true
     try {
-      const params = new URLSearchParams(filters).toString()
+      // Remove null/undefined/empty string params to keep URL clean and consistent
+      const cleanFilters = Object.fromEntries(
+        Object.entries(filters).filter(([_, v]) => v !== null && v !== undefined && v !== '')
+      )
+      const params = new URLSearchParams(cleanFilters).toString()
+
       const { data } = await axios.get(`/solicitudes?${params}`)
+
+      // Cache the response
+      requestCache.set(cacheKey, {
+        data: data.data,
+        pagination: {
+          current_page: data.current_page,
+          last_page: data.last_page,
+          total: data.total,
+          meta: data.meta
+        },
+        timestamp: now
+      })
+
       solicitudes.value = data.data // Paginado
       return data
     } catch (err) {

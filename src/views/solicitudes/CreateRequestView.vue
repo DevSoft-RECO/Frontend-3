@@ -3,6 +3,13 @@
     <div class="flex justify-between items-center mb-6">
       <h1 class="text-2xl font-bold text-gray-800 dark:text-white">Mis Solicitudes</h1>
       <button
+        @click="refreshData"
+        class="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-lg flex items-center gap-2 transition-colors"
+      >
+        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"></path></svg>
+        Actualizar Lista
+      </button>
+      <button
         @click="openModal()"
         class="bg-verde-cope hover:bg-green-600 text-white px-4 py-2 rounded-lg flex items-center gap-2 transition-colors"
       >
@@ -172,7 +179,7 @@
 </template>
 
 <script setup>
-import { ref, onMounted, reactive } from 'vue'
+import { ref, onMounted, onUnmounted, reactive } from 'vue'
 import { useSolicitudesStore } from '@/stores/solicitudes'
 import { useLocalidadesStore } from '@/stores/localidades'
 import { useAuthStore } from '@/stores/auth'
@@ -221,9 +228,22 @@ const form = reactive({
     comentario_solicitud: ''
 })
 
+// Auto-refresh every 10 minutes
+let refreshInterval = null
+
 onMounted(async () => {
-    loadData()
+    await loadData()
     await localidadesStore.fetchDepartamentos()
+    // Set up auto-refresh every 10 minutes (600000ms)
+    refreshInterval = setInterval(() => {
+        loadData(pagination.value.current_page || 1, true) // Force refresh on auto-update
+    }, 600000)
+})
+
+onUnmounted(() => {
+    if (refreshInterval) {
+        clearInterval(refreshInterval)
+    }
 })
 
 // TIMELINE LOGIC
@@ -249,11 +269,11 @@ const loadComunidades = async () => {
     if(selectedMuni.value) await localidadesStore.fetchComunidades(selectedMuni.value)
 }
 
-const loadData = async (page = 1) => {
+const loadData = async (page = 1, forceRefresh = false) => {
     loading.value = true
     try {
         // We pass { page, own: 1 } to filter only my requests (even if admin)
-        const res = await store.fetchSolicitudes({ page, own: 1 })
+        const res = await store.fetchSolicitudes({ page, own: 1 }, forceRefresh)
 
         // Handle response with or without pagination
         if (res.data && Array.isArray(res.data)) {
@@ -280,6 +300,10 @@ const loadData = async (page = 1) => {
 
 const changePage = (page) => {
     loadData(page)
+}
+
+const refreshData = () => {
+    loadData(pagination.value.current_page || 1, true) // Force refresh
 }
 
 const getStatusClass = (status) => {

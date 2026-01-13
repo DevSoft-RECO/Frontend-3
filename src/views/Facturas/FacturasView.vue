@@ -7,6 +7,13 @@
       </div>
       <div class="flex gap-2">
            <button
+            @click="refreshData"
+            class="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-lg shadow transition flex items-center gap-2 text-sm font-medium"
+          >
+            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"></path></svg>
+            Actualizar Lista
+          </button>
+          <button
             @click="downloadCsv"
             :disabled="loading"
             class="bg-green-600 hover:bg-green-700 text-white px-4 py-2 rounded-lg shadow transition flex items-center gap-2 text-sm font-medium disabled:opacity-50"
@@ -138,7 +145,7 @@
 </template>
 
 <script setup>
-import { ref, onMounted, reactive } from 'vue'
+import { ref, onMounted, onUnmounted, reactive } from 'vue'
 import { useFacturasStore } from '@/stores/facturas'
 import BaseTable from '@/components/ui/BaseTable.vue'
 
@@ -210,6 +217,9 @@ const downloadCsv = async () => {
     }
 }
 
+// Auto-refresh every 10 minutes
+let refreshInterval = null
+
 onMounted(async () => {
     loading.value = true
     await Promise.all([
@@ -217,6 +227,16 @@ onMounted(async () => {
         loadCategorias()
     ])
     loading.value = false
+    // Set up auto-refresh every 10 minutes (600000ms)
+    refreshInterval = setInterval(() => {
+        loadData(pagination.value.current_page || 1, true) // Force refresh on auto-update
+    }, 600000)
+})
+
+onUnmounted(() => {
+    if (refreshInterval) {
+        clearInterval(refreshInterval)
+    }
 })
 
 const loadCategorias = async () => {
@@ -225,7 +245,7 @@ const loadCategorias = async () => {
     } catch(e) { console.error(e) }
 }
 
-const loadData = async (page = 1) => {
+const loadData = async (page = 1, forceRefresh = false) => {
     loading.value = true
     try {
         const params = {
@@ -234,7 +254,7 @@ const loadData = async (page = 1) => {
             fecha_inicio: filters.fecha_inicio,
             fecha_fin: filters.fecha_fin
         }
-        const res = await store.fetchFacturas(params)
+        const res = await store.fetchFacturas(params, forceRefresh)
         if (Array.isArray(res.data)) {
              facturas.value = res.data
         } else if (Array.isArray(res)) {
@@ -255,6 +275,10 @@ const loadData = async (page = 1) => {
 }
 
 const changePage = (page) => loadData(page)
+
+const refreshData = () => {
+    loadData(pagination.value.current_page || 1, true) // Force refresh
+}
 
 // Debounce search
 let timeout = null

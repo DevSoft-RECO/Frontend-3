@@ -37,6 +37,10 @@
         <button @click="loadData(1)" class="bg-indigo-600 text-white px-4 py-2 rounded-lg hover:bg-indigo-700 transition">
             Filtrar
         </button>
+        <button @click="refreshData" class="bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700 transition flex items-center gap-2">
+            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"></path></svg>
+            Actualizar Lista
+        </button>
         <button @click="exportCsv" class="bg-green-600 text-white px-4 py-2 rounded-lg hover:bg-green-700 transition flex items-center gap-2">
             <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path></svg>
             Exportar CSV
@@ -88,7 +92,7 @@
 </template>
 
 <script setup>
-import { ref, onMounted, reactive } from 'vue'
+import { ref, reactive, onMounted, onUnmounted } from 'vue'
 import { useSolicitudesStore } from '@/stores/solicitudes'
 import BaseTable from '@/components/ui/BaseTable.vue'
 import ManagementModal from './Seguimiento_gestion/ManagementModal.vue'
@@ -116,14 +120,27 @@ const pagination = ref({
 const showManagementModal = ref(false)
 const selectedItem = ref(null)
 
+// Auto-refresh every 10 minutes
+let refreshInterval = null
+
 onMounted(async () => {
     await loadData()
+    // Set up auto-refresh every 10 minutes (600000ms)
+    refreshInterval = setInterval(() => {
+        loadData(pagination.value.current_page || 1, true) // Force refresh on auto-update
+    }, 600000)
 })
 
-const loadData = async (page = 1) => {
+onUnmounted(() => {
+    if (refreshInterval) {
+        clearInterval(refreshInterval)
+    }
+})
+
+const loadData = async (page = 1, forceRefresh = false) => {
     loading.value = true
     try {
-        const res = await store.fetchSolicitudes({ ...filters, page })
+        const res = await store.fetchSolicitudes({ ...filters, page }, forceRefresh)
         if (res.data && Array.isArray(res.data)) {
              requests.value = res.data
 
@@ -146,6 +163,10 @@ const loadData = async (page = 1) => {
 }
 
 const changePage = (page) => { loadData(page) }
+
+const refreshData = () => {
+    loadData(pagination.value.current_page || 1, true) // Force refresh
+}
 
 const getStatusClass = (status) => {
     return status === 'SOLICITADO' ? 'bg-blue-100 text-blue-800' :
