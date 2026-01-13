@@ -2,7 +2,7 @@
   <header
     class="sticky top-0 z-30 flex h-16 w-full items-center justify-between px-6
            bg-white dark:bg-gray-800
-           border-b border-gray-200 dark:border-gray-700
+           border-b-2 border-emerald-500
            shadow-sm transition-colors duration-300"
   >
     <div class="flex items-center gap-4">

@@ -22,16 +22,13 @@
       layoutStore.isCollapsed ? 'w-20' : 'w-72'
     ]"
   >
-    <div class="h-16 flex items-center justify-between px-6 shrink-0
+    <div class="h-16 flex items-center justify-center px-4 shrink-0
                 bg-black/10 dark:bg-black/20 border-b border-white/5 dark:border-gray-800">
-      <div v-if="!layoutStore.isCollapsed" class="flex items-center gap-3 fade-in w-full">
-        <img src="@/assets/logoyk.svg" alt="YK" class="h-8 w-auto object-contain brightness-0 invert" />
-        <span class="font-bold text-lg tracking-wider uppercase text-white dark:text-gray-100">
-            Mercadeo
-        </span>
+      <div v-if="!layoutStore.isCollapsed" class="flex items-center justify-center w-full fade-in">
+        <img src="@/assets/logomercadeo.png" alt="Mercadeo" class="h-12 w-auto object-contain transition-transform hover:scale-105" />
       </div>
       <div v-else class="w-full flex justify-center fade-in">
-        <img src="@/assets/logoyk.svg" alt="YK" class="h-8 w-8 object-contain brightness-0 invert" />
+        <img src="@/assets/logomovil.png" alt="YK" class="h-10 w-10 object-contain" />
       </div>
     </div>
 
