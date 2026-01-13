@@ -421,7 +421,7 @@ const submitForm = async () => {
             await store.createSolicitud(formData)
         }
         closeModal()
-        loadData(isEditing.value ? pagination.value.current_page : 1)
+        loadData(isEditing.value ? pagination.value.current_page : 1, true)
     } catch (e) {
         alert("Error al guardar: " + (e.response?.data?.message || e.message))
     } finally {
