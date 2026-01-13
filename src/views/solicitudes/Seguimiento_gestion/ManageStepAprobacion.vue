@@ -16,7 +16,11 @@
               </div>
               <div>
                   <label class="block text-xs font-bold text-gray-500">Responsable Asignado</label>
-                  <input v-model="form.responsable_asignado" class="w-full border rounded p-2 dark:bg-gray-700 dark:text-white">
+                  <select v-model="form.responsable_asignado" class="w-full border rounded p-2 dark:bg-gray-700 dark:text-white">
+                      <option value="">Selecciona...</option>
+                      <option value="Fundación">Fundación</option>
+                      <option value="Mercadeo">Mercadeo</option>
+                  </select>
               </div>
               <div>
                   <label class="block text-xs font-bold text-gray-500">Monto (Q)</label>
@@ -62,7 +66,7 @@
 </template>
 
 <script setup>
-import { ref, computed, reactive, onMounted } from 'vue'
+import { ref, computed, reactive, onMounted, watch } from 'vue'
 import { useAuthStore } from '@/stores/auth'
 import { useSolicitudesStore } from '@/stores/solicitudes'
 
@@ -85,6 +89,17 @@ const isPending = computed(() => props.request.estado === 'EN_GESTION' && canMan
 onMounted(() => {
     store.fetchTiposApoyo()
 })
+
+// Watch for changes in props.request to update form when data refreshes
+watch(() => props.request, (newRequest) => {
+    if (newRequest && !isEditing.value) {
+        Object.assign(form, {
+            tipo_apoyo_id: newRequest.tipo_apoyo_id || '',
+            responsable_asignado: newRequest.responsable_asignado || '',
+            monto: newRequest.monto || ''
+        })
+    }
+}, { deep: true, immediate: true })
 
 const formatDate = (d) => d ? new Date(d).toLocaleDateString() : '-'
 

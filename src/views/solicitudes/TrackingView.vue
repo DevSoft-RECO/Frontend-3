@@ -37,6 +37,10 @@
         <button @click="loadData(1)" class="bg-indigo-600 text-white px-4 py-2 rounded-lg hover:bg-indigo-700 transition">
             Filtrar
         </button>
+        <button @click="exportCsv" class="bg-green-600 text-white px-4 py-2 rounded-lg hover:bg-green-700 transition flex items-center gap-2">
+            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path></svg>
+            Exportar CSV
+        </button>
     </div>
 
     <!-- TABLA COMPONENTE -->
@@ -156,8 +160,42 @@ const openModal = (item) => {
     showManagementModal.value = true
 }
 
+
 const closeModal = () => {
     showManagementModal.value = false
     selectedItem.value = null
 }
+
+const exportCsv = () => {
+    const token = localStorage.getItem('access_token')
+    const baseUrl = import.meta.env.VITE_API_URL || 'http://localhost:8000'
+    const url = `${baseUrl}/api/solicitudes/export/csv`
+
+    // Create a temporary link to trigger download
+    const link = document.createElement('a')
+    link.href = url
+    link.setAttribute('download', '')
+    link.style.display = 'none'
+
+    // Add authorization header via fetch and blob
+    fetch(url, {
+        headers: {
+            'Authorization': `Bearer ${token}`
+        }
+    })
+    .then(response => response.blob())
+    .then(blob => {
+        const blobUrl = window.URL.createObjectURL(blob)
+        link.href = blobUrl
+        document.body.appendChild(link)
+        link.click()
+        document.body.removeChild(link)
+        window.URL.revokeObjectURL(blobUrl)
+    })
+    .catch(error => {
+        console.error('Error downloading CSV:', error)
+        alert('Error al descargar el archivo CSV')
+    })
+}
+
 </script>
