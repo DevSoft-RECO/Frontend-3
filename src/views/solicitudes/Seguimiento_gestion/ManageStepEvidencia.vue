@@ -13,12 +13,14 @@
 
           <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
               <div>
-                  <label class="block text-xs font-bold text-gray-500 mb-1">Foto Entrega</label>
-                  <input @change="handleFileEntrega" type="file" accept="image/*" class="block w-full text-sm text-gray-500 file:mr-4 file:py-2 file:px-4 file:rounded-full file:border-0 file:text-sm file:font-semibold file:bg-purple-50 file:text-purple-700 hover:file:bg-purple-100 dark:text-gray-300">
+                  <label class="block text-xs font-bold text-gray-500 mb-1">Documento Entrega (PDF)</label>
+                  <input @change="handleFileEntrega" type="file" accept="application/pdf" class="block w-full text-sm text-gray-500 file:mr-4 file:py-2 file:px-4 file:rounded-full file:border-0 file:text-sm file:font-semibold file:bg-purple-50 file:text-purple-700 hover:file:bg-purple-100 dark:text-gray-300">
+                  <p class="text-xs text-gray-400 mt-1">Máx. 5MB</p>
               </div>
               <div>
-                  <label class="block text-xs font-bold text-gray-500 mb-1">Foto Acta/Conocimiento</label>
-                  <input @change="handleFileConocimiento" type="file" accept="image/*" class="block w-full text-sm text-gray-500 file:mr-4 file:py-2 file:px-4 file:rounded-full file:border-0 file:text-sm file:font-semibold file:bg-purple-50 file:text-purple-700 hover:file:bg-purple-100 dark:text-gray-300">
+                  <label class="block text-xs font-bold text-gray-500 mb-1">Documento Acta/Conocimiento (PDF)</label>
+                  <input @change="handleFileConocimiento" type="file" accept="application/pdf" class="block w-full text-sm text-gray-500 file:mr-4 file:py-2 file:px-4 file:rounded-full file:border-0 file:text-sm file:font-semibold file:bg-purple-50 file:text-purple-700 hover:file:bg-purple-100 dark:text-gray-300">
+                  <p class="text-xs text-gray-400 mt-1">Máx. 5MB</p>
               </div>
           </div>
 
@@ -49,14 +51,29 @@
                            <p v-else class="text-xs text-gray-400 italic">No disponible</p>
                        </div>
                        <div class="border rounded p-2 bg-white dark:bg-gray-800">
+                           <p class="text-xs font-bold text-gray-500 mb-2">Evidencia Entrega</p>
+                           <SecureDoc
+                                v-if="request.path_foto_entrega"
+                                :id="request.id"
+                                type="entrega"
+                                customClass="flex items-center gap-2 text-purple-700 font-medium hover:underline p-2 bg-purple-50 rounded"
+                           >
+                                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path></svg>
+                                Ver PDF
+                           </SecureDoc>
+                           <p v-else class="text-xs text-gray-400 italic">No disponible</p>
+                       </div>
+                       <div class="border rounded p-2 bg-white dark:bg-gray-800">
                            <p class="text-xs font-bold text-gray-500 mb-2">Evidencia Conocimiento</p>
-                           <SecureImage
+                           <SecureDoc
                                 v-if="request.path_foto_conocimiento"
                                 :id="request.id"
                                 type="conocimiento"
-                                imageClass="w-full h-32 object-cover rounded border hover:opacity-90 transition cursor-pointer"
-                                @click="openDoc('conocimiento')"
-                           />
+                                customClass="flex items-center gap-2 text-purple-700 font-medium hover:underline p-2 bg-purple-50 rounded"
+                           >
+                                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path></svg>
+                                Ver PDF
+                           </SecureDoc>
                            <p v-else class="text-xs text-gray-400 italic">No disponible</p>
                        </div>
                    </div>
@@ -74,7 +91,7 @@
 import { ref, computed } from 'vue'
 import { useAuthStore } from '@/stores/auth'
 import { useSolicitudesStore } from '@/stores/solicitudes'
-import SecureImage from '@/components/shared/SecureImage.vue'
+import SecureDoc from '@/components/shared/SecureDoc.vue'
 
 const props = defineProps({ request: Object })
 const emit = defineEmits(['refresh'])

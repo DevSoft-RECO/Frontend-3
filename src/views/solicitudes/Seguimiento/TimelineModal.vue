@@ -54,7 +54,7 @@
                 <StepSolicitud v-if="activeStep === 1" :request="request" />
                 <StepGestion v-if="activeStep === 2" :request="request" />
                 <StepAprobacion v-if="activeStep === 3" :request="request" />
-                <StepFinalizacion v-if="activeStep === 4" :request="request" @refresh="emit('refresh')" />
+                <StepFinalizacion v-if="activeStep === 4" :request="request" @refresh="handleFinalizationSuccess" />
             </div>
 
         </div>
@@ -148,6 +148,13 @@ const handleStepClick = (stepNum) => {
     if(stepNum <= maxAccessibleStep.value) {
         activeStep.value = stepNum
     }
+}
+
+const handleFinalizationSuccess = () => {
+    emit('refresh')
+    setTimeout(() => {
+        close()
+    }, 500) // Small delay for better UX
 }
 
 const close = () => {

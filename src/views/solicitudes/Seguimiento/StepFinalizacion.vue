@@ -17,20 +17,26 @@
 
         <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
             <div class="text-center bg-white dark:bg-gray-800 p-4 rounded border dark:border-gray-700">
-                <span class="text-sm font-bold block mb-2 dark:text-gray-300 uppercase">Foto de Entrega</span>
-                <SecureImage
+                <span class="text-sm font-bold block mb-2 dark:text-gray-300 uppercase">Documento de Entrega</span>
+                <SecureDoc
                     :id="request.id"
                     type="entrega"
-                    imageClass="w-full h-48 object-cover rounded-lg border hover:opacity-90 transition shadow-sm"
-                />
+                    customClass="inline-flex items-center gap-2 bg-green-50 text-green-700 px-4 py-3 rounded-lg hover:bg-green-100 transition shadow-sm font-medium border border-green-200"
+                >
+                     <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path></svg>
+                     Ver PDF Entrega
+                </SecureDoc>
             </div>
             <div class="text-center bg-white dark:bg-gray-800 p-4 rounded border dark:border-gray-700">
                 <span class="text-sm font-bold block mb-2 dark:text-gray-300 uppercase">Carta de Conocimiento</span>
-                <SecureImage
+                <SecureDoc
                     :id="request.id"
                     type="conocimiento"
-                    imageClass="w-full h-48 object-cover rounded-lg border hover:opacity-90 transition shadow-sm"
-                />
+                    customClass="inline-flex items-center gap-2 bg-green-50 text-green-700 px-4 py-3 rounded-lg hover:bg-green-100 transition shadow-sm font-medium border border-green-200"
+                >
+                     <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path></svg>
+                     Ver PDF Carta
+                </SecureDoc>
             </div>
         </div>
     </div>
@@ -42,12 +48,12 @@
 
          <form @submit.prevent="submitEvidence" class="space-y-4 max-w-lg mx-auto">
             <div>
-                <label class="block text-sm font-bold text-gray-700 dark:text-gray-300 mb-1">Foto de Entrega (Obligatorio)</label>
-                <input @change="e => handleFile(e, 'entrega')" type="file" accept="image/*" class="block w-full text-sm text-gray-500 dark:text-gray-300 file:mr-4 file:py-2 file:px-4 file:rounded-full file:border-0 file:text-sm file:font-semibold file:bg-indigo-50 file:text-indigo-700 hover:file:bg-indigo-100" required>
+                <label class="block text-sm font-bold text-gray-700 dark:text-gray-300 mb-1">Documento de Entrega (PDF)</label>
+                <input @change="e => handleFile(e, 'entrega')" type="file" accept="application/pdf" class="block w-full text-sm text-gray-500 dark:text-gray-300 file:mr-4 file:py-2 file:px-4 file:rounded-full file:border-0 file:text-sm file:font-semibold file:bg-indigo-50 file:text-indigo-700 hover:file:bg-indigo-100" required>
             </div>
             <div>
-                <label class="block text-sm font-bold text-gray-700 dark:text-gray-300 mb-1">Foto Carta Conocimiento (Obligatorio)</label>
-                <input @change="e => handleFile(e, 'conocimiento')" type="file" accept="image/*" class="block w-full text-sm text-gray-500 dark:text-gray-300 file:mr-4 file:py-2 file:px-4 file:rounded-full file:border-0 file:text-sm file:font-semibold file:bg-indigo-50 file:text-indigo-700 hover:file:bg-indigo-100" required>
+                <label class="block text-sm font-bold text-gray-700 dark:text-gray-300 mb-1">Documento Carta Conocimiento (PDF)</label>
+                <input @change="e => handleFile(e, 'conocimiento')" type="file" accept="application/pdf" class="block w-full text-sm text-gray-500 dark:text-gray-300 file:mr-4 file:py-2 file:px-4 file:rounded-full file:border-0 file:text-sm file:font-semibold file:bg-indigo-50 file:text-indigo-700 hover:file:bg-indigo-100" required>
             </div>
 
             <div class="pt-4">
@@ -80,7 +86,7 @@
 <script setup>
 import { ref, reactive } from 'vue'
 import { useSolicitudesStore } from '@/stores/solicitudes'
-import SecureImage from '@/components/shared/SecureImage.vue'
+import SecureDoc from '@/components/shared/SecureDoc.vue'
 
 const props = defineProps({
     request: { type: Object, required: true }
