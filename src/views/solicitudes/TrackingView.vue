@@ -105,6 +105,7 @@ const loading = ref(false)
 // COLUMNAS BASE TABLE
 const columns = [
     { key: 'id', label: 'ID', truncate: true },
+    { key: 'agencia_id', label: 'Agenc.', truncate: true },
     { key: 'fecha_evento', label: 'Evento', truncate: true },
     { key: 'nombre_solicitante', label: 'Solicitante', truncate: true },
     { key: 'estado', label: 'Estado', truncate: false },

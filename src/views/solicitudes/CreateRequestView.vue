@@ -95,8 +95,8 @@
                             <input v-model="form.telefono" type="text" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 dark:bg-gray-700 dark:border-gray-600 dark:text-white" required>
                         </div>
                         <div>
-                            <label class="block text-sm font-medium text-gray-700 dark:text-gray-300">Nombre Contacto (Opcional)</label>
-                            <input v-model="form.nombre_contacto" type="text" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 dark:bg-gray-700 dark:border-gray-600 dark:text-white">
+                            <label class="block text-sm font-medium text-gray-700 dark:text-gray-300">Nombre Contacto</label>
+                            <input v-model="form.nombre_contacto" type="text" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 dark:bg-gray-700 dark:border-gray-600 dark:text-white" required>
                         </div>
                     </div>
 
@@ -182,13 +182,13 @@
 import { ref, onMounted, onUnmounted, reactive } from 'vue'
 import { useSolicitudesStore } from '@/stores/solicitudes'
 import { useLocalidadesStore } from '@/stores/localidades'
-import { useAuthStore } from '@/stores/auth'
+
 import TimelineModal from './Seguimiento/TimelineModal.vue'
 import BaseTable from '@/components/ui/BaseTable.vue'
 
 const store = useSolicitudesStore()
 const localidadesStore = useLocalidadesStore()
-const authStore = useAuthStore()
+
 
 const solicitudes = ref([])
 const loading = ref(false)
@@ -205,6 +205,7 @@ const selectedMuni = ref(null)
 // DEFINICIÓN DE COLUMNAS
 const columns = [
     { key: 'id', label: 'ID', truncate: true },
+    { key: 'agencia_id', label: 'ID mi Agencia', truncate: true },
     { key: 'fecha_evento', label: 'Fecha Evento', truncate: true },
     { key: 'nombre_solicitante', label: 'Solicitante', truncate: true },
     { key: 'estado', label: 'Estado', truncate: false },
