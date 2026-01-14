@@ -61,6 +61,7 @@ import { ref, computed } from 'vue'
 import { useAuthStore } from '@/stores/auth'
 import { useSolicitudesStore } from '@/stores/solicitudes'
 import SecureDoc from '@/components/shared/SecureDoc.vue'
+import Swal from 'sweetalert2'
 
 const props = defineProps({ request: Object })
 const emit = defineEmits(['refresh'])
@@ -86,22 +87,53 @@ const save = async () => {
 
         if(isEditing.value) {
             // Update mode
-            if(!file.value) return alert("Selecciona un archivo para actualizar")
+            if(!file.value) {
+                loading.value = false
+                Swal.fire({
+                    icon: 'warning',
+                    title: 'Archivo Requerido',
+                    text: 'Selecciona un archivo para actualizar'
+                })
+                return
+            }
             await store.updateSolicitud(props.request.id, formData)
             isEditing.value = false
             emit('refresh')
+            Swal.fire({
+                icon: 'success',
+                title: 'Actualizado',
+                text: 'Evidencia actualizada correctamente',
+                timer: 1500,
+                showConfirmButton: false
+            })
         } else {
             // Finalize mode
             if(!file.value) {
                 loading.value = false
-                return alert("El documento es requerido para finalizar")
+                Swal.fire({
+                    icon: 'warning',
+                    title: 'Archivo Requerido',
+                    text: 'El documento es requerido para finalizar'
+                })
+                return
             }
             await store.finalizarSolicitud(props.request.id, formData)
             emit('refresh')
+            Swal.fire({
+                icon: 'success',
+                title: 'Finalizado',
+                text: 'Proceso finalizado exitosamente',
+                timer: 1500,
+                showConfirmButton: false
+            })
         }
-    } catch(e) { alert("Error: " + e.message) }
+    } catch(e) {
+        Swal.fire({
+            icon: 'error',
+            title: 'Error',
+            text: e.response?.data?.message || e.message
+        })
+    }
     finally { loading.value = false }
 }
-
-
 </script>

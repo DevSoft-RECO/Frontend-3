@@ -77,6 +77,7 @@
 import { ref, computed } from 'vue'
 import { useAuthStore } from '@/stores/auth'
 import { useSolicitudesStore } from '@/stores/solicitudes'
+import Swal from 'sweetalert2'
 
 const props = defineProps({ request: Object })
 const emit = defineEmits(['refresh', 'next'])
@@ -102,35 +103,97 @@ const startEdit = () => {
 }
 
 const save = async () => {
-    if(!comment.value) return alert("Comentario requerido")
+    if(!comment.value) {
+        Swal.fire({
+            icon: 'warning',
+            title: 'Comentario requerido',
+            text: 'Debes ingresar un comentario para continuar.'
+        })
+        return
+    }
     try {
         if(isEditing.value) {
             await store.updateSolicitud(props.request.id, { comentario_gestion: comment.value })
             isEditing.value = false
             emit('refresh')
+            Swal.fire({
+                icon: 'success',
+                title: 'Actualizado',
+                text: 'Comentario de gestión actualizado.',
+                timer: 1500,
+                showConfirmButton: false
+            })
         } else {
             await store.gestionarSolicitud(props.request.id, comment.value, authStore.user?.name || 'Desconocido')
             emit('refresh')
             emit('next')
+            Swal.fire({
+                icon: 'success',
+                title: 'En Gestión',
+                text: 'La solicitud ha comenzado su gestión.',
+                timer: 1500,
+                showConfirmButton: false
+            })
         }
-    } catch(e) { alert("Error: " + e.message) }
+    } catch(e) {
+        Swal.fire({
+            icon: 'error',
+            title: 'Error',
+            text: e.response?.data?.message || e.message
+        })
+    }
 }
 
 const openRechazo = () => showRechazo.value = true
 const submitRechazo = async () => {
-    if(!rechazoReason.value) return alert("Motivo requerido")
+    if(!rechazoReason.value) {
+        Swal.fire({
+            icon: 'warning',
+            title: 'Motivo requerido',
+            text: 'Debes indicar el motivo del rechazo.'
+        })
+        return
+    }
     try {
         await store.rechazarSolicitud(props.request.id, rechazoReason.value, authStore.user?.name || 'Desconocido')
         showRechazo.value = false
         emit('refresh')
-    } catch(e) { alert("Error: " + e.message) }
+        Swal.fire({
+            icon: 'success',
+            title: 'Solicitud Denegada',
+            text: 'La solicitud ha sido rechazada correctamente.',
+            timer: 1500,
+            showConfirmButton: false
+        })
+    } catch(e) {
+        Swal.fire({
+            icon: 'error',
+            title: 'Error',
+            text: e.response?.data?.message || e.message
+        })
+    }
 }
 
 const reactivate = async () => {
-    if(!confirm("¿Seguro que desea reactivar esta solicitud? Volverá al estado SOLICITADO.")) return;
-    try {
-        await store.reactivarSolicitud(props.request.id)
-        emit('refresh')
-    } catch(e) { alert("Error: " + e.message) }
+    const result = await Swal.fire({
+        title: '¿Reactivar Solicitud?',
+        text: "La solicitud volverá al estado SOLICITADO y podrá ser gestionada nuevamente.",
+        icon: 'question',
+        showCancelButton: true,
+        confirmButtonColor: '#4F46E5',
+        cancelButtonColor: '#EF4444',
+        confirmButtonText: 'Sí, reactivar',
+        cancelButtonText: 'Cancelar'
+    })
+
+    if (result.isConfirmed) {
+        try {
+            await store.reactivarSolicitud(props.request.id)
+            emit('refresh')
+            Swal.fire('Reactivada', 'La solicitud ha sido reactivada.', 'success')
+        } catch(e) {
+            Swal.fire('Error', e.message, 'error')
+        }
+    }
 }
 </script>

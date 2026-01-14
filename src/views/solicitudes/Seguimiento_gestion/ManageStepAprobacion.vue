@@ -77,6 +77,7 @@
 import { ref, computed, reactive, onMounted, watch } from 'vue'
 import { useAuthStore } from '@/stores/auth'
 import { useSolicitudesStore } from '@/stores/solicitudes'
+import Swal from 'sweetalert2'
 
 const props = defineProps({ request: Object })
 const emit = defineEmits(['refresh', 'next'])
@@ -125,7 +126,14 @@ const startEdit = () => {
 const handleFile = (e) => file.value = e.target.files[0]
 
 const save = async () => {
-    if(!form.tipo_apoyo_id || !form.responsable_asignado) return alert("Campos requeridos")
+    if(!form.tipo_apoyo_id || !form.responsable_asignado) {
+        Swal.fire({
+            icon: 'warning',
+            title: 'Campos requeridos',
+            text: 'Por favor complete el Tipo de Apoyo y el Responsable.'
+        })
+        return
+    }
 
     loading.value = true
     try {
@@ -141,13 +149,41 @@ const save = async () => {
             await store.updateSolicitud(props.request.id, formData)
             isEditing.value = false
             emit('refresh')
+            Swal.fire({
+                icon: 'success',
+                title: 'Actualizado',
+                text: 'Aprobación actualizada correctamente',
+                timer: 1500,
+                showConfirmButton: false
+            })
         } else {
-            if(!file.value) { loading.value = false; return alert("Archivo requerido"); }
+            if(!file.value) {
+                loading.value = false;
+                Swal.fire({
+                    icon: 'warning',
+                    title: 'Archivo Requerido',
+                    text: 'Debe subir el documento firmado para aprobar.'
+                })
+                return;
+            }
             await store.aprobarSolicitud(props.request.id, formData)
             emit('refresh')
             emit('next')
+            Swal.fire({
+                icon: 'success',
+                title: 'Aprobada',
+                text: 'La solicitud ha sido aprobada exitosamente',
+                timer: 1500,
+                showConfirmButton: false
+            })
         }
-    } catch(e) { alert("Error: " + e.message) }
+    } catch(e) {
+        Swal.fire({
+            icon: 'error',
+            title: 'Error',
+            text: e.response?.data?.message || e.message
+        })
+    }
     finally { loading.value = false }
 }
 

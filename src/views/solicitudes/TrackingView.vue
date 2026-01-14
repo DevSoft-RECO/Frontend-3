@@ -99,6 +99,7 @@ import { ref, reactive, onMounted, onUnmounted } from 'vue'
 import { useSolicitudesStore } from '@/stores/solicitudes'
 import BaseTable from '@/components/ui/BaseTable.vue'
 import ManagementModal from './Seguimiento_gestion/ManagementModal.vue'
+import Swal from 'sweetalert2'
 
 const store = useSolicitudesStore()
 const requests = ref([])
@@ -223,7 +224,11 @@ const exportCsv = () => {
     })
     .catch(error => {
         console.error('Error downloading CSV:', error)
-        alert('Error al descargar el archivo CSV')
+        Swal.fire({
+            icon: 'error',
+            title: 'Error de Exportación',
+            text: 'Hubo un problema al descargar el archivo CSV.'
+        })
     })
 }
 

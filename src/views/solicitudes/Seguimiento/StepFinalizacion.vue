@@ -72,6 +72,7 @@
 import { ref } from 'vue'
 import { useSolicitudesStore } from '@/stores/solicitudes'
 import SecureDoc from '@/components/shared/SecureDoc.vue'
+import Swal from 'sweetalert2'
 
 const props = defineProps({
     request: { type: Object, required: true }
@@ -87,7 +88,14 @@ const handleFile = (e) => {
 }
 
 const submitEvidence = async () => {
-    if(!files.value) return alert("El documento es requerido")
+    if(!files.value) {
+        Swal.fire({
+            icon: 'warning',
+            title: 'Archivo Requerido',
+            text: 'El documento es requerido'
+        })
+        return
+    }
 
     submitting.value = true
     try {
@@ -96,10 +104,20 @@ const submitEvidence = async () => {
 
         await store.finalizarSolicitud(props.request.id, formData)
 
-        alert("¡Evidencia subida correctamente! Proceso finalizado.")
+        Swal.fire({
+            icon: 'success',
+            title: '¡Finalizado!',
+            text: '¡Evidencia subida correctamente! Proceso finalizado.',
+            timer: 2000,
+            showConfirmButton: false
+        })
         emit('refresh') // Recargar datos padre
     } catch (e) {
-        alert("Error: " + (e.response?.data?.message || e.message))
+        Swal.fire({
+            icon: 'error',
+            title: 'Error',
+            text: e.response?.data?.message || e.message
+        })
     } finally {
         submitting.value = false
     }

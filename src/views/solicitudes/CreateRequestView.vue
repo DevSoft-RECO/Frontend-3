@@ -186,6 +186,7 @@
 import { ref, onMounted, onUnmounted, reactive } from 'vue'
 import { useSolicitudesStore } from '@/stores/solicitudes'
 import { useLocalidadesStore } from '@/stores/localidades'
+import Swal from 'sweetalert2'
 
 import TimelineModal from './Seguimiento/TimelineModal.vue'
 import BaseTable from '@/components/ui/BaseTable.vue'
@@ -423,13 +424,33 @@ const submitForm = async () => {
                  // No file, just data
                  await store.updateSolicitud(form.id, form)
              }
+
+             Swal.fire({
+                icon: 'success',
+                title: 'Actualizado',
+                text: 'La solicitud se ha actualizado correctamente',
+                timer: 2000,
+                showConfirmButton: false
+             })
         } else {
             await store.createSolicitud(formData)
+
+            Swal.fire({
+                icon: 'success',
+                title: 'Creada',
+                text: 'La solicitud se ha creado exitosamente',
+                timer: 2000,
+                showConfirmButton: false
+             })
         }
         closeModal()
         loadData(isEditing.value ? pagination.value.current_page : 1, true)
     } catch (e) {
-        alert("Error al guardar: " + (e.response?.data?.message || e.message))
+        Swal.fire({
+            icon: 'error',
+            title: 'Error',
+            text: e.response?.data?.message || e.message
+        })
     } finally {
         submitting.value = false
     }

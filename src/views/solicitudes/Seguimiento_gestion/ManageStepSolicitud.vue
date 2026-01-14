@@ -149,6 +149,7 @@ import { ref, computed, reactive } from 'vue'
 import { useAuthStore } from '@/stores/auth'
 import { useSolicitudesStore } from '@/stores/solicitudes'
 import { useLocalidadesStore } from '@/stores/localidades'
+import Swal from 'sweetalert2'
 
 const props = defineProps({ request: Object })
 const emit = defineEmits(['refresh'])
@@ -257,9 +258,23 @@ const save = async () => {
 
         await store.updateSolicitud(props.request.id, formData)
 
+        Swal.fire({
+            icon: 'success',
+            title: 'Actualizado',
+            text: 'Información actualizada correctamente',
+            timer: 1500,
+            showConfirmButton: false
+        })
+
         isEditing.value = false
         emit('refresh')
-    } catch(e) { alert("Error: " + e.message) }
+    } catch(e) {
+        Swal.fire({
+            icon: 'error',
+            title: 'Error',
+            text: e.response?.data?.message || e.message
+        })
+    }
 }
 
 const openDoc = async (type) => {
