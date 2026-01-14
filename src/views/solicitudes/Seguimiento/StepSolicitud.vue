@@ -16,7 +16,9 @@
         <!-- Fecha Evento -->
         <div>
             <p class="text-gray-500 font-bold uppercase text-xs mb-1">Fecha Evento</p>
-            <p class="dark:text-white font-medium text-base">{{ formatDate(request.fecha_evento) }}</p>
+            <p class="dark:text-white font-medium text-base">
+                Del {{ formatDate(request.fecha_evento_inicio) }} al {{ formatDate(request.fecha_evento_fin) }}
+            </p>
         </div>
 
         <!-- Solicitante -->

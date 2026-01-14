@@ -59,8 +59,11 @@
             <span class="font-medium dark:text-white">#{{ value }}</span>
         </template>
 
-        <template #cell-fecha_evento="{ value }">
-            <span class="dark:text-gray-300">{{ value ? new Date(value).toLocaleDateString() : '-' }}</span>
+        <template #cell-fecha_evento_inicio="{ row }">
+            <div class="flex flex-col text-xs">
+                <span class="dark:text-gray-300 font-medium">Del: {{ row.fecha_evento_inicio ? new Date(row.fecha_evento_inicio).toLocaleDateString() : '-' }}</span>
+                <span class="dark:text-gray-400">Al: {{ row.fecha_evento_fin ? new Date(row.fecha_evento_fin).toLocaleDateString() : '-' }}</span>
+            </div>
         </template>
 
         <template #cell-nombre_solicitante="{ value }">
@@ -106,7 +109,7 @@ const loading = ref(false)
 const columns = [
     { key: 'id', label: 'ID', truncate: true },
     { key: 'agencia_id', label: 'Agenc.', truncate: true },
-    { key: 'fecha_evento', label: 'Evento', truncate: true },
+    { key: 'fecha_evento_inicio', label: 'Evento', truncate: true },
     { key: 'nombre_solicitante', label: 'Solicitante', truncate: true },
     { key: 'estado', label: 'Estado', truncate: false },
     { key: 'actions', label: 'Acciones', align: 'right', truncate: false }

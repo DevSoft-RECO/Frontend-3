@@ -23,6 +23,10 @@
                 <p class="text-gray-500 font-bold uppercase text-xs mb-1">Responsable</p>
                 <p class="dark:text-white font-medium">{{ request.responsable_asignado }}</p>
             </div>
+            <div class="bg-white dark:bg-gray-800 p-3 rounded shadow-sm border border-gray-100 dark:border-gray-700 col-span-1 md:col-span-3">
+                <p class="text-gray-500 font-bold uppercase text-xs mb-1">Comentario Aprobación</p>
+                <p class="dark:text-white text-sm italic">"{{ request.comentario_aprobacion || 'Sin comentarios' }}"</p>
+            </div>
         </div>
 
         <div>

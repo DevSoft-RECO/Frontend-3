@@ -34,7 +34,7 @@
         </template>
 
         <!-- CUSTOM CELL: FECHA -->
-        <template #cell-fecha_evento="{ value }">
+        <template #cell-fecha_evento_inicio="{ value }">
             {{ new Date(value).toLocaleDateString() }}
         </template>
 
@@ -80,8 +80,12 @@
                             <input v-model="form.fecha_solicitud" type="date" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 dark:bg-gray-700 dark:border-gray-600 dark:text-white" required>
                         </div>
                         <div>
-                            <label class="block text-sm font-medium text-gray-700 dark:text-gray-300">Fecha Evento</label>
-                            <input v-model="form.fecha_evento" type="date" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 dark:bg-gray-700 dark:border-gray-600 dark:text-white" required>
+                            <label class="block text-sm font-medium text-gray-700 dark:text-gray-300">Fecha Inicio Evento</label>
+                            <input v-model="form.fecha_evento_inicio" type="date" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 dark:bg-gray-700 dark:border-gray-600 dark:text-white" required>
+                        </div>
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 dark:text-gray-300">Fecha Fin Evento</label>
+                            <input v-model="form.fecha_evento_fin" :min="form.fecha_evento_inicio" type="date" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 dark:bg-gray-700 dark:border-gray-600 dark:text-white" required>
                         </div>
                     </div>
 
@@ -202,11 +206,10 @@ const selectedRequest = ref(null)
 const selectedDepto = ref(null)
 const selectedMuni = ref(null)
 
-// DEFINICIÓN DE COLUMNAS
 const columns = [
     { key: 'id', label: 'ID', truncate: true },
     { key: 'agencia_id', label: 'ID mi Agencia', truncate: true },
-    { key: 'fecha_evento', label: 'Fecha Evento', truncate: true },
+    { key: 'fecha_evento_inicio', label: 'Fecha Inicio', truncate: true },
     { key: 'nombre_solicitante', label: 'Solicitante', truncate: true },
     { key: 'estado', label: 'Estado', truncate: false },
     { key: 'actions', label: 'Acciones', align: 'right', truncate: false }
@@ -221,7 +224,8 @@ const pagination = ref({
 const form = reactive({
     id: null,
     fecha_solicitud: '',
-    fecha_evento: '',
+    fecha_evento_inicio: '',
+    fecha_evento_fin: '',
     nombre_solicitante: '',
     telefono: '',
     nombre_contacto: '',
@@ -328,7 +332,8 @@ const editSolicitud = (item) => {
     isEditing.value = true
     Object.assign(form, item)
     if(item.fecha_solicitud) form.fecha_solicitud = item.fecha_solicitud.split('T')[0]
-    if(item.fecha_evento) form.fecha_evento = item.fecha_evento.split('T')[0]
+    if(item.fecha_evento_inicio) form.fecha_evento_inicio = item.fecha_evento_inicio.split('T')[0]
+    if(item.fecha_evento_fin) form.fecha_evento_fin = item.fecha_evento_fin.split('T')[0]
 
     showModal.value = true
 

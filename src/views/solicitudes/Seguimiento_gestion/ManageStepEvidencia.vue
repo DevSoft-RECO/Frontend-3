@@ -12,14 +12,9 @@
           </p>
 
           <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-              <div>
-                  <label class="block text-xs font-bold text-gray-500 mb-1">Documento Entrega (PDF)</label>
-                  <input @change="handleFileEntrega" type="file" accept="application/pdf" class="block w-full text-sm text-gray-500 file:mr-4 file:py-2 file:px-4 file:rounded-full file:border-0 file:text-sm file:font-semibold file:bg-purple-50 file:text-purple-700 hover:file:bg-purple-100 dark:text-gray-300">
-                  <p class="text-xs text-gray-400 mt-1">Máx. 5MB</p>
-              </div>
-              <div>
-                  <label class="block text-xs font-bold text-gray-500 mb-1">Documento Acta/Conocimiento (PDF)</label>
-                  <input @change="handleFileConocimiento" type="file" accept="application/pdf" class="block w-full text-sm text-gray-500 file:mr-4 file:py-2 file:px-4 file:rounded-full file:border-0 file:text-sm file:font-semibold file:bg-purple-50 file:text-purple-700 hover:file:bg-purple-100 dark:text-gray-300">
+              <div class="md:col-span-2">
+                  <label class="block text-xs font-bold text-gray-500 mb-1">Documento Evidencia (PDF)</label>
+                  <input @change="handleFile" type="file" accept="application/pdf" class="block w-full text-sm text-gray-500 file:mr-4 file:py-2 file:px-4 file:rounded-full file:border-0 file:text-sm file:font-semibold file:bg-purple-50 file:text-purple-700 hover:file:bg-purple-100 dark:text-gray-300">
                   <p class="text-xs text-gray-400 mt-1">Máx. 5MB</p>
               </div>
           </div>
@@ -38,44 +33,18 @@
       <div v-else-if="request.estado === 'FINALIZADO'">
            <div class="flex justify-between items-start">
                <div class="w-full">
-                   <div class="grid grid-cols-2 gap-4 mt-2">
-                       <div class="border rounded p-2 bg-white dark:bg-gray-800">
-                           <p class="text-xs font-bold text-gray-500 mb-2">Evidencia Entrega</p>
-                           <SecureImage
-                                v-if="request.path_foto_entrega"
-                                :id="request.id"
-                                type="entrega"
-                                imageClass="w-full h-32 object-cover rounded border hover:opacity-90 transition cursor-pointer"
-                                @click="openDoc('entrega')"
-                           />
-                           <p v-else class="text-xs text-gray-400 italic">No disponible</p>
-                       </div>
-                       <div class="border rounded p-2 bg-white dark:bg-gray-800">
-                           <p class="text-xs font-bold text-gray-500 mb-2">Evidencia Entrega</p>
-                           <SecureDoc
-                                v-if="request.path_foto_entrega"
-                                :id="request.id"
-                                type="entrega"
-                                customClass="flex items-center gap-2 text-purple-700 font-medium hover:underline p-2 bg-purple-50 rounded"
-                           >
-                                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path></svg>
-                                Ver PDF
-                           </SecureDoc>
-                           <p v-else class="text-xs text-gray-400 italic">No disponible</p>
-                       </div>
-                       <div class="border rounded p-2 bg-white dark:bg-gray-800">
-                           <p class="text-xs font-bold text-gray-500 mb-2">Evidencia Conocimiento</p>
-                           <SecureDoc
-                                v-if="request.path_foto_conocimiento"
-                                :id="request.id"
-                                type="conocimiento"
-                                customClass="flex items-center gap-2 text-purple-700 font-medium hover:underline p-2 bg-purple-50 rounded"
-                           >
-                                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path></svg>
-                                Ver PDF
-                           </SecureDoc>
-                           <p v-else class="text-xs text-gray-400 italic">No disponible</p>
-                       </div>
+                   <div class="mt-2 border rounded p-4 bg-white dark:bg-gray-800">
+                       <p class="text-xs font-bold text-gray-500 mb-2 uppercase">Documento de Evidencia</p>
+                       <SecureDoc
+                            v-if="request.path_documento_evidencia"
+                            :id="request.id"
+                            type="evidencia"
+                            customClass="flex items-center gap-2 text-purple-700 font-medium hover:underline p-3 bg-purple-50 rounded border border-purple-100 transition hover:bg-purple-100"
+                       >
+                            <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path></svg>
+                            Ver PDF Evidencia
+                       </SecureDoc>
+                       <p v-else class="text-xs text-gray-400 italic">No disponible</p>
                    </div>
                </div>
                <button v-if="canManage" @click="isEditing = true" class="text-xs text-purple-600 hover:underline ml-4 mt-2">Editar</button>
@@ -101,35 +70,31 @@ const store = useSolicitudesStore()
 
 const loading = ref(false)
 const isEditing = ref(false)
-const fileEntrega = ref(null)
-const fileConocimiento = ref(null)
+const file = ref(null)
 
 const isSuperAdmin = computed(() => authStore.hasRole('Super Admin'))
 const canManage = computed(() => isSuperAdmin.value || authStore.can('gestionar_solicitudes'))
 const isPending = computed(() => props.request.estado === 'APROBADO' && canManage.value)
-// If Aprobado -> Pending Finalization. If Finalized -> Not Pending (History).
 
-const handleFileEntrega = (e) => fileEntrega.value = e.target.files[0]
-const handleFileConocimiento = (e) => fileConocimiento.value = e.target.files[0]
+const handleFile = (e) => file.value = e.target.files[0]
 
 const save = async () => {
     loading.value = true
     try {
         const formData = new FormData()
-        if(fileEntrega.value) formData.append('foto_entrega', fileEntrega.value)
-        if(fileConocimiento.value) formData.append('foto_conocimiento', fileConocimiento.value)
+        if(file.value) formData.append('documento_evidencia', file.value)
 
         if(isEditing.value) {
             // Update mode
-            if(!fileEntrega.value && !fileConocimiento.value) return alert("Selecciona al menos un archivo para actualizar")
+            if(!file.value) return alert("Selecciona un archivo para actualizar")
             await store.updateSolicitud(props.request.id, formData)
             isEditing.value = false
             emit('refresh')
         } else {
             // Finalize mode
-            if(!fileEntrega.value || !fileConocimiento.value) {
+            if(!file.value) {
                 loading.value = false
-                return alert("Ambas fotos son requeridas para finalizar")
+                return alert("El documento es requerido para finalizar")
             }
             await store.finalizarSolicitud(props.request.id, formData)
             emit('refresh')
@@ -138,8 +103,5 @@ const save = async () => {
     finally { loading.value = false }
 }
 
-const openDoc = async (type) => {
-    const url = await store.getFileUrl(props.request.id, type)
-    if(url) window.open(url, '_blank')
-}
+
 </script>

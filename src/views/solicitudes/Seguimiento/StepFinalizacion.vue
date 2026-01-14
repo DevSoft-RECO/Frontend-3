@@ -11,31 +11,20 @@
             <svg class="w-10 h-10 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
             <div>
                  <h4 class="font-bold text-green-800 dark:text-green-300">Proceso Completado Exitosamente</h4>
-                 <p class="text-sm text-green-600 dark:text-green-400">Se han cargado las evidencias de entrega y conocimiento.</p>
+                 <p class="text-sm text-green-600 dark:text-green-400">Se ha cargado el documento de evidencia.</p>
             </div>
         </div>
 
         <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
-            <div class="text-center bg-white dark:bg-gray-800 p-4 rounded border dark:border-gray-700">
-                <span class="text-sm font-bold block mb-2 dark:text-gray-300 uppercase">Documento de Entrega</span>
+            <div class="text-center bg-white dark:bg-gray-800 p-4 rounded border dark:border-gray-700 col-span-2">
+                <span class="text-sm font-bold block mb-2 dark:text-gray-300 uppercase">Documento de Evidencia</span>
                 <SecureDoc
                     :id="request.id"
-                    type="entrega"
+                    type="evidencia"
                     customClass="inline-flex items-center gap-2 bg-green-50 text-green-700 px-4 py-3 rounded-lg hover:bg-green-100 transition shadow-sm font-medium border border-green-200"
                 >
                      <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path></svg>
-                     Ver PDF Entrega
-                </SecureDoc>
-            </div>
-            <div class="text-center bg-white dark:bg-gray-800 p-4 rounded border dark:border-gray-700">
-                <span class="text-sm font-bold block mb-2 dark:text-gray-300 uppercase">Carta de Conocimiento</span>
-                <SecureDoc
-                    :id="request.id"
-                    type="conocimiento"
-                    customClass="inline-flex items-center gap-2 bg-green-50 text-green-700 px-4 py-3 rounded-lg hover:bg-green-100 transition shadow-sm font-medium border border-green-200"
-                >
-                     <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path></svg>
-                     Ver PDF Carta
+                     Ver PDF Evidencia
                 </SecureDoc>
             </div>
         </div>
@@ -48,18 +37,14 @@
 
          <form @submit.prevent="submitEvidence" class="space-y-4 max-w-lg mx-auto">
             <div>
-                <label class="block text-sm font-bold text-gray-700 dark:text-gray-300 mb-1">Documento de Entrega (PDF)</label>
-                <input @change="e => handleFile(e, 'entrega')" type="file" accept="application/pdf" class="block w-full text-sm text-gray-500 dark:text-gray-300 file:mr-4 file:py-2 file:px-4 file:rounded-full file:border-0 file:text-sm file:font-semibold file:bg-indigo-50 file:text-indigo-700 hover:file:bg-indigo-100" required>
-            </div>
-            <div>
-                <label class="block text-sm font-bold text-gray-700 dark:text-gray-300 mb-1">Documento Carta Conocimiento (PDF)</label>
-                <input @change="e => handleFile(e, 'conocimiento')" type="file" accept="application/pdf" class="block w-full text-sm text-gray-500 dark:text-gray-300 file:mr-4 file:py-2 file:px-4 file:rounded-full file:border-0 file:text-sm file:font-semibold file:bg-indigo-50 file:text-indigo-700 hover:file:bg-indigo-100" required>
+                <label class="block text-sm font-bold text-gray-700 dark:text-gray-300 mb-1">Documento de Evidencia (PDF)</label>
+                <input @change="handleFile" type="file" accept="application/pdf" class="block w-full text-sm text-gray-500 dark:text-gray-300 file:mr-4 file:py-2 file:px-4 file:rounded-full file:border-0 file:text-sm file:font-semibold file:bg-indigo-50 file:text-indigo-700 hover:file:bg-indigo-100" required>
             </div>
 
             <div class="pt-4">
                 <button type="submit" :disabled="submitting" class="w-full bg-indigo-600 text-white font-bold py-3 rounded-lg hover:bg-indigo-700 transition shadow-lg disabled:opacity-50 flex justify-center items-center gap-2">
                     <span v-if="submitting">Subiendo...</span>
-                    <span v-else>Finalizar Entrega</span>
+                    <span v-else>Finalizar Solicitud</span>
                 </button>
             </div>
          </form>
@@ -84,7 +69,7 @@
 </template>
 
 <script setup>
-import { ref, reactive } from 'vue'
+import { ref } from 'vue'
 import { useSolicitudesStore } from '@/stores/solicitudes'
 import SecureDoc from '@/components/shared/SecureDoc.vue'
 
@@ -95,24 +80,23 @@ const props = defineProps({
 const emit = defineEmits(['refresh'])
 const store = useSolicitudesStore()
 const submitting = ref(false)
-const files = reactive({ entrega: null, conocimiento: null })
+const files = ref(null)
 
-const handleFile = (e, type) => {
-    files[type] = e.target.files[0]
+const handleFile = (e) => {
+    files.value = e.target.files[0]
 }
 
 const submitEvidence = async () => {
-    if(!files.entrega || !files.conocimiento) return alert("Ambos archivos son requeridos")
+    if(!files.value) return alert("El documento es requerido")
 
     submitting.value = true
     try {
         const formData = new FormData()
-        formData.append('foto_entrega', files.entrega)
-        formData.append('foto_conocimiento', files.conocimiento)
+        formData.append('documento_evidencia', files.value)
 
         await store.finalizarSolicitud(props.request.id, formData)
 
-        alert("¡Evidencias subidas correctamente! Proceso finalizado.")
+        alert("¡Evidencia subida correctamente! Proceso finalizado.")
         emit('refresh') // Recargar datos padre
     } catch (e) {
         alert("Error: " + (e.response?.data?.message || e.message))

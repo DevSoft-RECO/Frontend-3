@@ -30,6 +30,10 @@
                   <label class="block text-xs font-bold text-gray-500">Documento Firmado PDF</label>
                    <input @change="handleFile" type="file" accept="application/pdf" class="block w-full text-sm text-gray-500 file:mr-4 file:py-2 file:px-4 file:rounded-full file:border-0 file:text-sm file:font-semibold file:bg-green-50 file:text-green-700 hover:file:bg-green-100 dark:text-gray-300">
               </div>
+              <div class="md:col-span-2">
+                  <label class="block text-xs font-bold text-gray-500">Comentario Aprobación</label>
+                  <textarea v-model="form.comentario_aprobacion" rows="2" class="w-full border rounded p-2 dark:bg-gray-700 dark:text-white" placeholder="Opcional"></textarea>
+              </div>
           </div>
 
           <div v-if="loading" class="text-center text-green-600 font-bold py-2">Procesando archivo, por favor espere...</div>
@@ -45,7 +49,7 @@
       <!-- VIEW HISTORY -->
       <div v-else>
            <div class="flex justify-between items-start">
-               <div class="space-y-2 text-sm">
+               <div class="space-y-2 text-sm w-full">
                    <p><span class="font-bold text-gray-500">Tipo Apoyo:</span> {{ request.tipo_apoyo?.nombre || request.tipo_apoyo_id }}</p>
                    <p><span class="font-bold text-gray-500">Responsable:</span> {{ request.responsable_asignado }}</p>
                    <p><span class="font-bold text-gray-500">Monto:</span> Q{{ request.monto }}</p>
@@ -53,6 +57,10 @@
                        <span class="font-bold text-gray-500">Aprobado por:</span> {{ request.nombre_usuario_aprobacion || 'Sistema' }}
                        <span class="text-xs text-gray-400">({{ formatDate(request.fecha_aprobacion) }})</span>
                    </p>
+                   <div v-if="request.comentario_aprobacion" class="mt-2 p-2 bg-green-50 dark:bg-green-900/20 rounded border border-green-100 dark:border-green-800">
+                        <p class="text-xs font-bold text-green-800 dark:text-green-300">Comentario:</p>
+                        <p class="text-sm italic dark:text-gray-300">"{{ request.comentario_aprobacion }}"</p>
+                   </div>
 
                    <button v-if="request.path_documento_firmado" @click="openDoc" class="text-green-600 hover:underline flex items-center gap-1 font-medium mt-1">
                         <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path></svg>
@@ -79,7 +87,7 @@ const store = useSolicitudesStore()
 const loading = ref(false)
 const isEditing = ref(false)
 const file = ref(null)
-const form = reactive({ tipo_apoyo_id: '', responsable_asignado: '', monto: '' })
+const form = reactive({ tipo_apoyo_id: '', responsable_asignado: '', monto: '', comentario_aprobacion: '' })
 
 const isSuperAdmin = computed(() => authStore.hasRole('Super Admin'))
 const canManage = computed(() => isSuperAdmin.value || authStore.can('admin_mercadeo'))
@@ -96,7 +104,8 @@ watch(() => props.request, (newRequest) => {
         Object.assign(form, {
             tipo_apoyo_id: newRequest.tipo_apoyo_id || '',
             responsable_asignado: newRequest.responsable_asignado || '',
-            monto: newRequest.monto || ''
+            monto: newRequest.monto || '',
+            comentario_aprobacion: newRequest.comentario_aprobacion || ''
         })
     }
 }, { deep: true, immediate: true })
@@ -107,7 +116,8 @@ const startEdit = () => {
     Object.assign(form, {
         tipo_apoyo_id: props.request.tipo_apoyo_id,
         responsable_asignado: props.request.responsable_asignado,
-        monto: props.request.monto
+        monto: props.request.monto,
+        comentario_aprobacion: props.request.comentario_aprobacion
     })
     isEditing.value = true
 }
@@ -123,6 +133,7 @@ const save = async () => {
         formData.append('tipo_apoyo_id', form.tipo_apoyo_id)
         formData.append('responsable_asignado', form.responsable_asignado)
         formData.append('monto', form.monto)
+        if(form.comentario_aprobacion) formData.append('comentario_aprobacion', form.comentario_aprobacion)
         if(file.value) formData.append('documento_firmado', file.value)
         formData.append('nombre_usuario', authStore.user?.name || 'Desconocido')
 

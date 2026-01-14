@@ -37,8 +37,11 @@
             <p class="dark:text-white font-medium text-base">{{ formatDate(request.fecha_solicitud) }}</p>
         </div>
         <div>
+
             <p class="text-gray-500 font-bold uppercase text-xs mb-1">Fecha Evento</p>
-            <p class="dark:text-white font-medium text-base">{{ formatDate(request.fecha_evento) }}</p>
+            <p class="dark:text-white font-medium text-base">
+                Del {{ formatDate(request.fecha_evento_inicio) }} al {{ formatDate(request.fecha_evento_fin) }}
+            </p>
         </div>
         <div>
             <p class="text-gray-500 font-bold uppercase text-xs mb-1">Agencia (ID)</p>
@@ -80,8 +83,12 @@
                 <input v-model="form.fecha_solicitud" type="date" class="w-full border rounded p-2 dark:bg-gray-700 dark:text-white">
             </div>
              <div>
-                <label class="block text-xs font-bold text-gray-500">Fecha Evento</label>
-                <input v-model="form.fecha_evento" type="date" class="w-full border rounded p-2 dark:bg-gray-700 dark:text-white">
+                <label class="block text-xs font-bold text-gray-500">Fecha Evento Inicio</label>
+                <input v-model="form.fecha_evento_inicio" type="date" class="w-full border rounded p-2 dark:bg-gray-700 dark:text-white">
+            </div>
+            <div>
+                <label class="block text-xs font-bold text-gray-500">Fecha Evento Fin</label>
+                <input v-model="form.fecha_evento_fin" :min="form.fecha_evento_inicio" type="date" class="w-full border rounded p-2 dark:bg-gray-700 dark:text-white">
             </div>
         </div>
 
@@ -167,7 +174,8 @@ const form = reactive({
     nombre_contacto: '',
     comunidad_id: '',
     fecha_solicitud: '',
-    fecha_evento: '',
+    fecha_evento_inicio: '',
+    fecha_evento_fin: '',
     comentario_solicitud: ''
 })
 
@@ -181,7 +189,8 @@ const startEdit = () => {
         nombre_contacto: props.request.nombre_contacto || '',
         comunidad_id: props.request.comunidad_id,
         fecha_solicitud: props.request.fecha_solicitud?.split('T')[0],
-        fecha_evento: props.request.fecha_evento?.split('T')[0],
+        fecha_evento_inicio: props.request.fecha_evento_inicio?.split('T')[0],
+        fecha_evento_fin: props.request.fecha_evento_fin?.split('T')[0],
         comentario_solicitud: props.request.comentario_solicitud
     })
 
