@@ -20,79 +20,101 @@
       </div>
 
       <!-- STATS CARDS -->
-      <div v-if="dashboardStore.loading" class="grid grid-cols-1 md:grid-cols-5 gap-4">
-          <div v-for="i in 5" :key="i" class="h-32 bg-gray-200 dark:bg-gray-700 rounded-lg animate-pulse"></div>
-      </div>
+      <!-- STATS CARDS -->
+      <template v-if="authStore.can('admin_mercadeo')">
+        <div v-if="dashboardStore.loading" class="grid grid-cols-1 md:grid-cols-5 gap-4">
+            <div v-for="i in 5" :key="i" class="h-32 bg-gray-200 dark:bg-gray-700 rounded-lg animate-pulse"></div>
+        </div>
 
-      <div v-else class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-4">
-          <!-- CARD: SOLICITADO -->
-          <DashboardCard
-              title="Solicitados"
-              :count="stats?.SOLICITADO?.count || 0"
-              icon="inbox"
-              color="blue"
-              :clickable="canInteract"
-              @click="openIdsModal('SOLICITADO', stats?.SOLICITADO?.ids)"
-          />
-          <!-- CARD: EN GESTION -->
-          <DashboardCard
-              title="En Gestión"
-              :count="stats?.EN_GESTION?.count || 0"
-              icon="clock"
-              color="yellow"
-              :clickable="canInteract"
-              @click="openIdsModal('EN_GESTION', stats?.EN_GESTION?.ids)"
-          />
-          <!-- CARD: APROBADO -->
-          <DashboardCard
-              title="Aprobados"
-              :count="stats?.APROBADO?.count || 0"
-              icon="check-circle"
-              color="green"
-              :clickable="canInteract"
-              @click="openIdsModal('APROBADO', stats?.APROBADO?.ids)"
-          />
-           <!-- CARD: FINALIZADO -->
-           <DashboardCard
-              title="Finalizados"
-              :count="stats?.FINALIZADO?.count || 0"
-              icon="flag"
-              color="gray"
-              :clickable="canInteract"
-              @click="openIdsModal('FINALIZADO', stats?.FINALIZADO?.ids)"
-          />
-           <!-- CARD: DENEGADO (RECHAZADO internally) -->
-           <DashboardCard
-              title="Denegados"
-              :count="stats?.RECHAZADO?.count || 0"
-              icon="ban"
-              color="red"
-              :clickable="canInteract"
-              @click="openIdsModal('RECHAZADO', stats?.RECHAZADO?.ids)"
-          />
-      </div>
+        <div v-else class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-4">
+            <!-- CARD: SOLICITADO -->
+            <DashboardCard
+                title="Solicitados"
+                :count="stats?.SOLICITADO?.count || 0"
+                icon="inbox"
+                color="blue"
+                :clickable="canInteract"
+                @click="openIdsModal('SOLICITADO', stats?.SOLICITADO?.ids)"
+            />
+            <!-- CARD: EN GESTION -->
+            <DashboardCard
+                title="En Gestión"
+                :count="stats?.EN_GESTION?.count || 0"
+                icon="clock"
+                color="yellow"
+                :clickable="canInteract"
+                @click="openIdsModal('EN_GESTION', stats?.EN_GESTION?.ids)"
+            />
+            <!-- CARD: APROBADO -->
+            <DashboardCard
+                title="Aprobados"
+                :count="stats?.APROBADO?.count || 0"
+                icon="check-circle"
+                color="green"
+                :clickable="canInteract"
+                @click="openIdsModal('APROBADO', stats?.APROBADO?.ids)"
+            />
+             <!-- CARD: FINALIZADO -->
+             <DashboardCard
+                title="Finalizados"
+                :count="stats?.FINALIZADO?.count || 0"
+                icon="flag"
+                color="gray"
+                :clickable="canInteract"
+                @click="openIdsModal('FINALIZADO', stats?.FINALIZADO?.ids)"
+            />
+             <!-- CARD: DENEGADO (RECHAZADO internally) -->
+             <DashboardCard
+                title="Denegados"
+                :count="stats?.RECHAZADO?.count || 0"
+                icon="ban"
+                color="red"
+                :clickable="canInteract"
+                @click="openIdsModal('RECHAZADO', stats?.RECHAZADO?.ids)"
+            />
+        </div>
+      </template>
 
       <!-- UPCOMING EVENTS & SHORTCUTS -->
       <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
 
           <!-- Section: Próximos Eventos -->
           <div class="lg:col-span-2 bg-white dark:bg-gray-800 rounded-xl shadow-sm border border-gray-200 dark:border-gray-700 p-6">
-              <h3 class="text-lg font-bold text-gray-800 dark:text-white mb-4 flex items-center gap-2">
-                  <svg class="w-5 h-5 text-verde-cope" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"></path></svg>
-                  Próximos Eventos
-              </h3>
+                <div class="flex items-center justify-between mb-4">
+                  <h3 class="text-lg font-bold text-gray-800 dark:text-white flex items-center gap-2">
+                       <svg class="w-5 h-5 text-verde-cope" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"></path></svg>
+                       Próximos Eventos <span v-if="!showTabs" class="text-sm font-normal text-gray-500 ml-1">({{ activeTab === 'general' ? 'General' : 'Mi Agencia' }})</span>
+                  </h3>
+                   <!-- Tabs -->
+                  <div v-if="showTabs" class="flex bg-gray-100 dark:bg-gray-700 rounded-lg p-1">
+                      <button
+                          @click="activeTab = 'general'"
+                          class="px-3 py-1 text-xs font-medium rounded-md transition"
+                          :class="activeTab === 'general' ? 'bg-white dark:bg-gray-600 text-gray-800 dark:text-white shadow-sm' : 'text-gray-500 dark:text-gray-400 hover:text-gray-700'"
+                      >
+                          General
+                      </button>
+                      <button
+                          @click="activeTab = 'agency'"
+                          class="px-3 py-1 text-xs font-medium rounded-md transition"
+                          :class="activeTab === 'agency' ? 'bg-white dark:bg-gray-600 text-gray-800 dark:text-white shadow-sm' : 'text-gray-500 dark:text-gray-400 hover:text-gray-700'"
+                      >
+                          Mi Agencia
+                      </button>
+                  </div>
+              </div>
 
               <div v-if="dashboardStore.loading" class="space-y-3">
                    <div v-for="i in 3" :key="i" class="h-16 bg-gray-100 dark:bg-gray-700 rounded animate-pulse"></div>
               </div>
 
-              <div v-else-if="upcomingEvents.length === 0" class="text-center py-8 text-gray-500">
-                  No hay eventos próximos registrados.
+              <div v-else-if="currentEvents.length === 0" class="text-center py-8 text-gray-500">
+                  No hay eventos próximos {{ activeTab === 'agency' ? 'en tu agencia' : 'registrados' }}.
               </div>
 
               <div v-else class="space-y-4">
                   <div
-                      v-for="event in upcomingEvents"
+                      v-for="event in currentEvents"
                       :key="event.id"
                       class="flex items-center justify-between p-4 bg-gray-50 dark:bg-gray-700/50 rounded-lg border border-gray-100 dark:border-gray-700 transition group"
                       :class="canInteract ? 'hover:bg-gray-100 dark:hover:bg-gray-700 cursor-pointer' : 'cursor-default'"
@@ -198,9 +220,29 @@ const modalTitle = ref('')
 
 const stats = computed(() => dashboardStore.stats)
 const upcomingEvents = computed(() => dashboardStore.upcomingEvents)
+const myUpcomingEvents = computed(() => dashboardStore.myUpcomingEvents)
+
+// Tabs Logic
+const activeTab = ref('general')
+const canViewGeneral = computed(() => authStore.can('admin_mercadeo'))
+const canViewAgency = computed(() => authStore.can('gestionar_solicitudes'))
+
+const showTabs = computed(() => canViewGeneral.value && canViewAgency.value)
+
+const currentEvents = computed(() => {
+    if (activeTab.value === 'general') return upcomingEvents.value
+    return myUpcomingEvents.value
+})
 
 onMounted(async () => {
     await dashboardStore.fetchDashboardData()
+
+    // Set default tab based on permissions
+    if (canViewAgency.value) {
+        activeTab.value = 'agency'
+    } else if (canViewGeneral.value) {
+        activeTab.value = 'general'
+    }
 })
 
 // Helpers
