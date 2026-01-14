@@ -34,7 +34,7 @@
                 icon="inbox"
                 color="blue"
                 :clickable="canInteract"
-                @click="openIdsModal('SOLICITADO', stats?.SOLICITADO?.ids)"
+                @click="openIdsModal('SOLICITADO', stats?.SOLICITADO?.items)"
             />
             <!-- CARD: EN GESTION -->
             <DashboardCard
@@ -43,7 +43,7 @@
                 icon="clock"
                 color="yellow"
                 :clickable="canInteract"
-                @click="openIdsModal('EN_GESTION', stats?.EN_GESTION?.ids)"
+                @click="openIdsModal('EN_GESTION', stats?.EN_GESTION?.items)"
             />
             <!-- CARD: APROBADO -->
             <DashboardCard
@@ -52,7 +52,7 @@
                 icon="check-circle"
                 color="green"
                 :clickable="canInteract"
-                @click="openIdsModal('APROBADO', stats?.APROBADO?.ids)"
+                @click="openIdsModal('APROBADO', stats?.APROBADO?.items)"
             />
              <!-- CARD: FINALIZADO -->
              <DashboardCard
@@ -61,7 +61,7 @@
                 icon="flag"
                 color="gray"
                 :clickable="canInteract"
-                @click="openIdsModal('FINALIZADO', stats?.FINALIZADO?.ids)"
+                @click="openIdsModal('FINALIZADO', stats?.FINALIZADO?.items)"
             />
              <!-- CARD: DENEGADO (RECHAZADO internally) -->
              <DashboardCard
@@ -70,7 +70,7 @@
                 icon="ban"
                 color="red"
                 :clickable="canInteract"
-                @click="openIdsModal('RECHAZADO', stats?.RECHAZADO?.ids)"
+                @click="openIdsModal('RECHAZADO', stats?.RECHAZADO?.items)"
             />
         </div>
       </template>
@@ -187,9 +187,14 @@
                     Solicitudes: <span class="capitalize">{{ modalTitle }}</span>
                 </h3>
                 <div v-if="modalIds.length > 0" class="max-h-60 overflow-y-auto space-y-2 custom-scrollbar">
-                    <div v-for="id in modalIds" :key="id" class="p-2 bg-gray-50 dark:bg-gray-700 rounded border dark:border-gray-600 flex justify-between items-center">
-                        <span class="font-mono text-sm dark:text-gray-200">#{{ id }}</span>
-                         <button @click="goToDetail(id)" class="text-xs text-blue-600 hover:underline">Ver</button>
+                    <div v-for="item in modalIds" :key="item.id" class="p-2 bg-gray-50 dark:bg-gray-700 rounded border dark:border-gray-600 flex justify-between items-center group hover:bg-gray-100 dark:hover:bg-gray-600 transition">
+                        <div class="flex flex-col">
+                             <span class="font-medium text-sm text-gray-800 dark:text-gray-200">{{ item.name }}</span>
+                             <span class="text-xs text-gray-500 font-mono">ID: #{{ item.id }}</span>
+                        </div>
+                         <button @click="goToDetail(item.id)" class="text-xs text-blue-600 hover:underline font-bold px-2 py-1 rounded hover:bg-blue-50 dark:hover:bg-blue-900/30">
+                            Ver
+                         </button>
                     </div>
                 </div>
                 <div v-else class="text-gray-500 text-sm italic">
