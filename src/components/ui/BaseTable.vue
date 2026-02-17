@@ -10,7 +10,8 @@
                         :key="col.key"
                         :class="[
                             'px-6 py-3 text-xs font-medium text-gray-500 uppercase tracking-wider',
-                            col.align === 'right' ? 'text-right' : (col.align === 'center' ? 'text-center' : 'text-left')
+                            col.align === 'right' ? 'text-right' : (col.align === 'center' ? 'text-center' : 'text-left'),
+                            col.class ?? ''
                         ]"
                     >
                         {{ col.label }}
@@ -35,7 +36,8 @@
                         :class="[
                             'px-6 py-4 text-sm text-gray-900 dark:text-gray-100',
                             col.truncate !== false ? 'truncate' : '',
-                            col.align === 'right' ? 'text-right' : (col.align === 'center' ? 'text-center' : 'text-left')
+                            col.align === 'right' ? 'text-right' : (col.align === 'center' ? 'text-center' : 'text-left'),
+                            col.class ?? ''
                         ]"
                     >
                         <slot :name="`cell-${col.key}`" :row="row" :value="row[col.key]">

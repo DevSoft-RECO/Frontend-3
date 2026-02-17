@@ -211,7 +211,7 @@ const columns = [
     { key: 'id', label: 'ID', truncate: true },
     { key: 'agencia_id', label: 'ID mi Agencia', truncate: true },
     { key: 'fecha_evento_inicio', label: 'Fecha Inicio', truncate: true },
-    { key: 'nombre_solicitante', label: 'Solicitante', truncate: true },
+    { key: 'nombre_solicitante', label: 'Solicitante', truncate: false, class: 'w-1/4' },
     { key: 'estado', label: 'Estado', truncate: false },
     { key: 'actions', label: 'Acciones', align: 'right', truncate: false }
 ]

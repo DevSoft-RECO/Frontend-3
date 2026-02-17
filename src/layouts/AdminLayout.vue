@@ -1,27 +1,26 @@
 <template>
 <div
   class="relative flex h-screen
-         bg-gradient-to-br
-         from-gray-100 via-gray-200 to-gray-300
-         dark:from-[#0f172a] dark:via-[#020617] dark:to-black
+         bg-gray-50
+         dark:bg-gray-900
          text-gray-800 dark:text-gray-100
          font-sans overflow-hidden transition-colors duration-300">
 
-  <!-- Mancha gris superior izquierda -->
+  <!-- Manchas decorativas (comentadas para un look mas limpio y elegante) -->
+  <!--
   <div
     class="pointer-events-none absolute -top-40 -left-40 w-[700px] h-[700px]
            rounded-full blur-3xl
            bg-gray-700/25
            dark:bg-gray-600/15">
   </div>
-
-  <!-- Mancha gris inferior derecha -->
   <div
     class="pointer-events-none absolute -bottom-48 -right-48 w-[800px] h-[800px]
            rounded-full blur-3xl
            bg-gray-700/30
            dark:bg-gray-500/10">
   </div>
+  -->
 
 
 
