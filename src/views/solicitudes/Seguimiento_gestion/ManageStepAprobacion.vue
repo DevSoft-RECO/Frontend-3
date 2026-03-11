@@ -32,7 +32,7 @@
               </div>
               <div class="md:col-span-2">
                   <label class="block text-xs font-bold text-gray-500">Comentario Aprobación</label>
-                  <textarea v-model="form.comentario_aprobacion" rows="2" class="w-full border rounded p-2 dark:bg-gray-700 dark:text-white" placeholder="Opcional"></textarea>
+                  <textarea v-model="form.comentario_aprobacion" rows="2" maxlength="1000" class="w-full border rounded p-2 dark:bg-gray-700 dark:text-white" placeholder="Opcional"></textarea>
               </div>
           </div>
 
@@ -123,7 +123,42 @@ const startEdit = () => {
     isEditing.value = true
 }
 
-const handleFile = (e) => file.value = e.target.files[0]
+const handleFile = (e) => {
+    const selectedFile = e.target.files[0]
+    if (!selectedFile) {
+        file.value = null
+        return
+    }
+
+    // Validar extensión
+    if (selectedFile.type !== 'application/pdf') {
+        Swal.fire({
+            icon: 'error',
+            title: 'Archivo no válido',
+            text: 'Solo se permiten archivos PDF',
+            confirmButtonColor: '#4f46e5'
+        })
+        e.target.value = '' // Limpiar el input
+        file.value = null
+        return
+    }
+
+    // Validar tamaño (5MB)
+    const maxSize = 5 * 1024 * 1024
+    if (selectedFile.size > maxSize) {
+        Swal.fire({
+            icon: 'error',
+            title: 'Archivo demasiado grande',
+            text: 'El tamaño máximo permitido es de 5MB',
+            confirmButtonColor: '#4f46e5'
+        })
+        e.target.value = '' // Limpiar el input
+        file.value = null
+        return
+    }
+
+    file.value = selectedFile
+}
 
 const save = async () => {
     if(!form.tipo_apoyo_id || !form.responsable_asignado) {

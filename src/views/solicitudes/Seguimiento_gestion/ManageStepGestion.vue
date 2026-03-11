@@ -25,13 +25,16 @@
 
       <!-- EDIT/ACTION STATE -->
       <div v-else-if="isPending || isEditing">
-          <p class="text-sm text-blue-600 dark:text-blue-400 mb-2">
-            {{ isEditing ? 'Editar Comentario de Gestión' : 'Ingrese el comentario para iniciar la gestión:' }}
-          </p>
+          <div class="flex justify-between items-end mb-1">
+              <p class="text-sm text-blue-600 dark:text-blue-400">
+                {{ isEditing ? 'Editar Comentario de Gestión' : 'Ingrese el comentario para iniciar la gestión:' }}
+              </p>
+              <span class="text-xs text-blue-500">{{ comment.length }}/1000</span>
+          </div>
           <p v-if="!isEditing" class="text-xs text-gray-500 mb-2 italic">
               (Nota: Si va a denegar la solicitud, puede dejar este campo vacío. Se solicitará el motivo en la siguiente ventana).
           </p>
-          <textarea v-model="comment" class="w-full border rounded p-3 dark:bg-gray-700 dark:text-white" rows="3"></textarea>
+          <textarea v-model="comment" class="w-full border rounded p-3 dark:bg-gray-700 dark:text-white" rows="3" maxlength="1000"></textarea>
 
           <div class="flex justify-end mt-4 gap-2">
                <button v-if="isEditing" @click="isEditing = false" class="px-4 py-2 text-gray-500">Cancelar</button>
@@ -62,8 +65,11 @@
        <!-- Modal Rechazo Local -->
        <div v-if="showRechazo" class="fixed inset-0 z-[60] flex items-center justify-center bg-black/50 p-4">
            <div class="bg-white p-6 rounded w-full max-w-sm">
-               <p class="text-sm text-gray-600 mb-4">Por favor, indique el motivo por el cual deniega esta solicitud.</p>
-               <textarea v-model="rechazoReason" class="w-full border rounded p-2 mb-4" rows="3" placeholder="Motivo..."></textarea>
+                <div class="flex justify-between items-end mb-2">
+                    <p class="text-sm text-gray-600">Por favor, indique el motivo por el cual deniega esta solicitud.</p>
+                    <span class="text-xs text-gray-400">{{ rechazoReason.length }}/1000</span>
+                </div>
+                <textarea v-model="rechazoReason" class="w-full border rounded p-2 mb-4" rows="3" placeholder="Motivo..." maxlength="1000"></textarea>
                <div class="flex justify-end gap-2">
                    <button @click="showRechazo = false" class="px-4 py-2 text-gray-600 hover:bg-gray-100 rounded">Cancelar</button>
                    <button @click="submitRechazo" class="px-4 py-2 bg-red-600 text-white rounded hover:bg-red-700">Confirmar Denegación</button>

@@ -84,6 +84,7 @@
 <script setup>
 import { ref, onMounted } from 'vue'
 import { useSolicitudesStore } from '@/stores/solicitudes'
+import Swal from 'sweetalert2'
 
 const store = useSolicitudesStore()
 const requests = ref([])
@@ -123,7 +124,27 @@ const closeModal = () => {
 }
 
 const handleFile = (event, type) => {
-    files[type] = event.target.files[0]
+    const selectedFile = event.target.files[0]
+    if (!selectedFile) {
+        files[type] = null
+        return
+    }
+
+    // Validar tamaño (5MB)
+    const maxSize = 5 * 1024 * 1024
+    if (selectedFile.size > maxSize) {
+        Swal.fire({
+            icon: 'error',
+            title: 'Archivo demasiado grande',
+            text: 'El tamaño máximo permitido es de 5MB',
+            confirmButtonColor: '#4f46e5'
+        })
+        event.target.value = '' // Limpiar el input
+        files[type] = null
+        return
+    }
+
+    files[type] = selectedFile
 }
 
 const submitEvidence = async () => {

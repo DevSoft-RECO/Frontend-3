@@ -90,17 +90,20 @@
                     </div>
 
                     <div>
-                        <label class="block text-sm font-medium text-gray-700 dark:text-gray-300">Nombre Solicitante</label>
-                        <input v-model="form.nombre_solicitante" type="text" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 dark:bg-gray-700 dark:border-gray-600 dark:text-white" required>
+                        <div class="flex justify-between">
+                            <label class="block text-sm font-medium text-gray-700 dark:text-gray-300">Nombre Solicitante</label>
+                            <span class="text-xs text-gray-500">{{ form.nombre_solicitante.length }}/255</span>
+                        </div>
+                        <input v-model="form.nombre_solicitante" type="text" maxlength="255" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 dark:bg-gray-700 dark:border-gray-600 dark:text-white" required>
                     </div>
                      <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
                         <div>
                             <label class="block text-sm font-medium text-gray-700 dark:text-gray-300">Teléfono</label>
-                            <input v-model="form.telefono" type="text" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 dark:bg-gray-700 dark:border-gray-600 dark:text-white" required>
+                            <input v-model="form.telefono" type="text" maxlength="20" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 dark:bg-gray-700 dark:border-gray-600 dark:text-white" required>
                         </div>
                         <div>
                             <label class="block text-sm font-medium text-gray-700 dark:text-gray-300">Nombre Contacto</label>
-                            <input v-model="form.nombre_contacto" type="text" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 dark:bg-gray-700 dark:border-gray-600 dark:text-white" required>
+                            <input v-model="form.nombre_contacto" type="text" maxlength="255" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 dark:bg-gray-700 dark:border-gray-600 dark:text-white" required>
                         </div>
                     </div>
 
@@ -129,8 +132,13 @@
                     </div>
 
                     <div>
-                        <label class="block text-sm font-medium text-gray-700 dark:text-gray-300">Comentarios</label>
-                        <textarea v-model="form.comentario_solicitud" rows="3" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 dark:bg-gray-700 dark:border-gray-600 dark:text-white" required></textarea>
+                        <div class="flex justify-between">
+                            <label class="block text-sm font-medium text-gray-700 dark:text-gray-300">Comentarios</label>
+                            <span class="text-xs" :class="form.comentario_solicitud.length > 900 ? 'text-red-500' : 'text-gray-500'">
+                                {{ form.comentario_solicitud.length }}/1000
+                            </span>
+                        </div>
+                        <textarea v-model="form.comentario_solicitud" rows="3" maxlength="1000" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 dark:bg-gray-700 dark:border-gray-600 dark:text-white" required></textarea>
                     </div>
 
                     <div>
@@ -382,7 +390,40 @@ const resetForm = () => {
 }
 
 const handleFileUpload = (event) => {
-    file.value = event.target.files[0]
+    const selectedFile = event.target.files[0]
+    if (!selectedFile) {
+        file.value = null
+        return
+    }
+
+    // Validar extensión
+    if (selectedFile.type !== 'application/pdf') {
+        Swal.fire({
+            icon: 'error',
+            title: 'Archivo no válido',
+            text: 'Solo se permiten archivos PDF',
+            confirmButtonColor: '#4f46e5'
+        })
+        event.target.value = '' // Limpiar el input
+        file.value = null
+        return
+    }
+
+    // Validar tamaño (5MB = 5 * 1024 * 1024 bytes)
+    const maxSize = 5 * 1024 * 1024
+    if (selectedFile.size > maxSize) {
+        Swal.fire({
+            icon: 'error',
+            title: 'Archivo demasiado grande',
+            text: 'El tamaño máximo permitido es de 5MB',
+            confirmButtonColor: '#4f46e5'
+        })
+        event.target.value = '' // Limpiar el input
+        file.value = null
+        return
+    }
+
+    file.value = selectedFile
 }
 
 const submitForm = async () => {
