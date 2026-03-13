@@ -1,15 +1,16 @@
 <template>
-  <div v-if="show" class="fixed inset-0 z-50 flex items-center justify-center bg-black/40 backdrop-blur-sm p-4 transition-opacity">
-    <div class="bg-white dark:bg-gray-800 rounded-xl shadow-2xl w-full max-w-5xl flex flex-col max-h-[90vh] overflow-hidden border border-white/20">
+  <div v-if="show" class="fixed inset-0 z-50 flex items-center justify-center bg-gray-900/60 backdrop-blur-md p-4 transition-all duration-300">
+    <div class="bg-white/90 dark:bg-gray-800/90 backdrop-blur-2xl rounded-3xl shadow-2xl w-full max-w-5xl flex flex-col max-h-[90vh] overflow-hidden border border-white/40 dark:border-gray-700/50 animate-scale-in">
 
         <!-- HEADER -->
-        <div class="p-6 border-b dark:border-gray-700 flex justify-between items-center bg-gray-50 dark:bg-gray-900">
+        <div class="p-8 border-b dark:border-gray-700/50 flex justify-between items-center bg-gradient-to-r from-gray-50/50 to-white/50 dark:from-gray-900/50 dark:to-gray-800/50">
             <div>
-                <h2 class="text-2xl font-bold text-gray-800 dark:text-white">Seguimiento de Solicitud</h2>
-                <p class="text-sm text-gray-500">ID #{{ request?.id }} - {{ request?.nombre_solicitante }}</p>
+                <span class="text-[10px] font-extrabold uppercase tracking-[0.2em] text-indigo-600 dark:text-indigo-400 mb-1 block">Centro de Seguimiento</span>
+                <h2 class="text-3xl font-black text-gray-900 dark:text-white leading-tight">Solicitud <span class="text-indigo-600">#{{ request?.id }}</span></h2>
+                <p class="text-sm text-gray-500 font-medium">{{ request?.nombre_solicitante }}</p>
             </div>
-            <button @click="close" class="text-gray-400 hover:text-gray-600 dark:hover:text-gray-200 transition p-2 rounded-full hover:bg-gray-200 dark:hover:bg-gray-700">
-                <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path></svg>
+            <button @click="close" class="text-gray-400 hover:text-gray-900 dark:hover:text-white transition-all p-3 rounded-2xl hover:bg-gray-100 dark:hover:bg-gray-700 active:scale-90">
+                <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M6 18L18 6M6 6l12 12"></path></svg>
             </button>
         </div>
 
@@ -25,7 +26,7 @@
                             <button
                                 @click="handleStepClick(index + 1)"
                                 :disabled="index + 1 > maxAccessibleStep"
-                                class="w-10 h-10 rounded-full flex items-center justify-center font-bold transition-all duration-300 border-2"
+                                class="w-12 h-12 rounded-2xl flex items-center justify-center font-black transition-all duration-500 border-2 shadow-sm active:scale-95"
                                 :class="getStepCircleClass(index + 1)"
                             >
                                 <span v-if="activeStep > index + 1 && index + 1 <= maxAccessibleStep">✓</span>
@@ -135,11 +136,11 @@ const maxAccessibleStep = computed(() => {
 const getStepCircleClass = (stepNum) => {
     // Current Active
     if (activeStep.value === stepNum) {
-        return 'bg-indigo-600 text-white border-indigo-200 dark:border-indigo-900 shadow-lg scale-110'
+        return 'bg-indigo-600 text-white border-indigo-200 dark:border-indigo-900 shadow-xl shadow-indigo-500/30 scale-110'
     }
     // Completed / Accessible
     if (stepNum <= maxAccessibleStep.value) {
-        return 'bg-green-500 text-white border-green-200 dark:border-green-900 cursor-pointer hover:bg-green-600'
+        return 'bg-emerald-500 text-white border-emerald-200 dark:border-emerald-900 cursor-pointer hover:bg-emerald-600 shadow-lg shadow-emerald-500/20'
     }
     // Locked / Future
     return 'bg-gray-100 dark:bg-gray-700 text-gray-300 border-gray-200 dark:border-gray-600 cursor-not-allowed opacity-50'
@@ -162,3 +163,34 @@ const close = () => {
     emit('close')
 }
 </script>
+
+<style scoped>
+.animate-scale-in {
+    animation: scaleIn 0.4s cubic-bezier(0.34, 1.56, 0.64, 1);
+}
+
+@keyframes scaleIn {
+    from {
+        opacity: 0;
+        transform: scale(0.9) translateY(20px);
+    }
+    to {
+        opacity: 1;
+        transform: scale(1) translateY(0);
+    }
+}
+
+.custom-scrollbar::-webkit-scrollbar {
+    width: 6px;
+}
+.custom-scrollbar::-webkit-scrollbar-track {
+    background: transparent;
+}
+.custom-scrollbar::-webkit-scrollbar-thumb {
+    background: rgba(0, 0, 0, 0.1);
+    border-radius: 10px;
+}
+.dark .custom-scrollbar::-webkit-scrollbar-thumb {
+    background: rgba(255, 255, 255, 0.1);
+}
+</style>

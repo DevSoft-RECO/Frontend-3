@@ -145,6 +145,16 @@ export const useSolicitudesStore = defineStore('solicitudes', () => {
     }
   }
 
+  const fetchAuditStats = async () => {
+    try {
+      const { data } = await axios.get('/audit/stats')
+      return data
+    } catch (err) {
+      console.error("Error fetching audit stats:", err)
+      throw err
+    }
+  }
+
   const getSolicitud = async (id) => {
     loading.value = true
     try {
@@ -256,6 +266,7 @@ export const useSolicitudesStore = defineStore('solicitudes', () => {
     updateTipoApoyoAction,
     deleteTipoApoyo,
     fetchAuditSolicitudes,
-    fetchAgenciasCatalog
+    fetchAgenciasCatalog,
+    fetchAuditStats
   }
 })
