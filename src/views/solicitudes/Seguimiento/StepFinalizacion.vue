@@ -30,8 +30,8 @@
         </div>
     </div>
 
-    <!-- CASO 2: APROBADO (Formulario para subir evidencias) -->
-    <div v-else-if="request.estado === 'APROBADO'" class="bg-indigo-50 dark:bg-indigo-900/10 p-5 rounded-lg border border-indigo-100 dark:border-indigo-800">
+    <!-- CASO 2: APROBADO (Formulario para subir evidencias, solo si no es readOnly) -->
+    <div v-else-if="request.estado === 'APROBADO' && !readOnly" class="bg-indigo-50 dark:bg-indigo-900/10 p-5 rounded-lg border border-indigo-100 dark:border-indigo-800">
          <h5 class="font-bold text-indigo-700 dark:text-indigo-300 mb-2">Acción Requerida: Subir Evidencias</h5>
          <p class="text-sm text-gray-600 dark:text-gray-300 mb-4">Para finalizar el proceso, por favor sube las fotos que evidencian la entrega del apoyo.</p>
 
@@ -60,10 +60,11 @@
         <p class="mt-2 text-red-800 bg-red-50 inline-block px-3 py-1 rounded text-sm font-medium">Motivo: {{ request.motivo_rechazo }}</p>
     </div>
 
-    <!-- CASO 4: PENDIENTE (Pasos anteriores no completados) -->
+    <!-- CASO 4: PENDIENTE (Pasos anteriores no completados) O APROBADO en modo lectura -->
     <div v-else class="text-center py-10 opacity-50">
         <svg class="w-12 h-12 text-gray-300 mx-auto mb-2" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
-        <p class="text-gray-500">Este paso aún no está disponible.</p>
+        <p v-if="request.estado === 'APROBADO' && readOnly" class="text-gray-500 font-medium">Esperando evidencias por el responsable.</p>
+        <p v-else class="text-gray-500">Este paso aún no está disponible.</p>
     </div>
   </div>
 </template>
@@ -75,7 +76,8 @@ import SecureDoc from '@/components/shared/SecureDoc.vue'
 import Swal from 'sweetalert2'
 
 const props = defineProps({
-    request: { type: Object, required: true }
+    request: { type: Object, required: true },
+    readOnly: { type: Boolean, default: false }
 })
 
 const emit = defineEmits(['refresh'])

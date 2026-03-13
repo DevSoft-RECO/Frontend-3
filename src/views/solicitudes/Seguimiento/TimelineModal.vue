@@ -54,7 +54,7 @@
                 <StepSolicitud v-if="activeStep === 1" :request="request" />
                 <StepGestion v-if="activeStep === 2" :request="request" />
                 <StepAprobacion v-if="activeStep === 3" :request="request" />
-                <StepFinalizacion v-if="activeStep === 4" :request="request" @refresh="handleFinalizationSuccess" />
+                <StepFinalizacion v-if="activeStep === 4" :request="request" :readOnly="readOnly" @refresh="handleFinalizationSuccess" />
             </div>
 
         </div>
@@ -89,7 +89,8 @@ import StepFinalizacion from './StepFinalizacion.vue'
 
 const props = defineProps({
     show: { type: Boolean, default: false },
-    request: { type: Object, default: () => ({}) }
+    request: { type: Object, default: () => ({}) },
+    readOnly: { type: Boolean, default: false }
 })
 
 const emit = defineEmits(['close', 'refresh'])

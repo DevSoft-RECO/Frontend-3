@@ -90,7 +90,7 @@ export const useSolicitudesStore = defineStore('solicitudes', () => {
     try {
       // Remove null/undefined/empty string params to keep URL clean and consistent
       const cleanFilters = Object.fromEntries(
-        Object.entries(filters).filter(([_, v]) => v !== null && v !== undefined && v !== '')
+        Object.entries(filters).filter(([, v]) => v !== null && v !== undefined && v !== '')
       )
       const params = new URLSearchParams(cleanFilters).toString()
 
@@ -115,6 +115,33 @@ export const useSolicitudesStore = defineStore('solicitudes', () => {
       throw err
     } finally {
       loading.value = false
+    }
+  }
+
+  const fetchAuditSolicitudes = async (filters = {}) => {
+    loading.value = true
+    try {
+      const cleanFilters = Object.fromEntries(
+        Object.entries(filters).filter(([, v]) => v !== null && v !== undefined && v !== '')
+      )
+      const params = new URLSearchParams(cleanFilters).toString()
+      const { data } = await axios.get(`/audit/solicitudes?${params}`)
+      return data
+    } catch (err) {
+      error.value = err.response?.data?.message || 'Error al cargar auditoría'
+      throw err
+    } finally {
+      loading.value = false
+    }
+  }
+
+  const fetchAgenciasCatalog = async () => {
+    try {
+      const { data } = await axios.get('/audit/agencias-catalog')
+      return data
+    } catch (err) {
+      console.error("Error fetching agencias catalog:", err)
+      throw err
     }
   }
 
@@ -227,6 +254,8 @@ export const useSolicitudesStore = defineStore('solicitudes', () => {
     reactivarSolicitud,
     getFileUrl,
     updateTipoApoyoAction,
-    deleteTipoApoyo
+    deleteTipoApoyo,
+    fetchAuditSolicitudes,
+    fetchAgenciasCatalog
   }
 })
