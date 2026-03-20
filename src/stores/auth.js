@@ -1,12 +1,26 @@
 import { defineStore } from 'pinia'
 import { ref, computed } from 'vue'
+import axios from 'axios'
 import AuthService from '../services/AuthService'
 import MotherAuthService from '../services/MotherAuthService'
 import { getAvatarUrl } from '../utils/imageUtils'
 
+const MOTHER_API_URL = import.meta.env.VITE_MOTHER_API_URL || 'http://localhost:8000';
+const CLIENT_ID = import.meta.env.VITE_CLIENT_ID;
+const REDIRECT_URI = import.meta.env.VITE_REDIRECT_URI;
+
 export const useAuthStore = defineStore('auth', () => {
+  // MIGRACIÓN DE ALMACENAMIENTO (Limpia cachés viejas si cambias de arquitectura)
+  const STORAGE_VERSION = 'v2_pkce'; 
+  if (localStorage.getItem('yk_storage_version') !== STORAGE_VERSION) {
+    localStorage.removeItem('access_token');
+    localStorage.removeItem('user_data');
+    sessionStorage.removeItem('user_data');
+    localStorage.setItem('yk_storage_version', STORAGE_VERSION);
+  }
+
   // --- STATE ---
-  const user = ref(null)
+  const user = ref(JSON.parse(sessionStorage.getItem('user_data') || 'null'))
   const token = ref(localStorage.getItem('access_token') || null)
   const processingSSO = ref(false)
   const isReady = ref(false)
@@ -19,39 +33,44 @@ export const useAuthStore = defineStore('auth', () => {
   // --- ACTIONS ---
 
   /**
-   * Inicia el flujo de redirección a Microsoft/Laravel
+   * Procesa la validación PKCE, el canje del código y la carga del usuario.
+   */
+  async function handlePKCECallback(code) {
+    processingSSO.value = true;
+    const verifier = sessionStorage.getItem('pkce_verifier')
+    if (!verifier) throw new Error('No se encontró el verifier PKCE')
+
+    try {
+      const response = await axios.post(`${MOTHER_API_URL}/oauth/token`, {
+        grant_type: 'authorization_code',
+        client_id: CLIENT_ID,
+        redirect_uri: REDIRECT_URI,
+        code_verifier: verifier,
+        code: code
+      });
+
+      token.value = response.data.access_token;
+      localStorage.setItem('access_token', token.value);
+      sessionStorage.removeItem('pkce_verifier');
+
+      // Configurar el header de Authorization para las siguientes peticiones
+      axios.defaults.headers.common['Authorization'] = `Bearer ${token.value}`;
+
+      await fetchUser();
+    } catch {
+      console.error('Fallo al canjear PKCE o cargar usuario');
+      throw new Error('PKCE_EXCHANGE_FAILED');
+    } finally {
+      processingSSO.value = false;
+    }
+  }
+
+  /**
+   * Inicia el flujo de redirección a la Madre con PKCE
    */
   async function login() {
     processingSSO.value = true
     await AuthService.login()
-  }
-
-  /**
-   * Procesa el token que viene de la App Madre
-   */
-  async function handleDirectToken(incomingToken, userData = null) {
-    processingSSO.value = true
-    try {
-      const data = AuthService.processDirectToken(incomingToken, userData)
-      // data.access_token ya está en localStorage gracias al service
-      // data.user también, si venía
-
-      token.value = data.access_token
-
-      // Si recibimos usuario, actualizamos state de una vez
-      if (data.user) {
-        user.value = data.user
-      } else {
-        // Si no vino usuario completo, lo pedimos
-        await fetchUser()
-      }
-
-    } catch (error) {
-      console.error('Error procesando token SSO:', error)
-      throw error
-    } finally {
-      processingSSO.value = false
-    }
   }
 
   /**
@@ -65,22 +84,23 @@ export const useAuthStore = defineStore('auth', () => {
   }
 
   /**
-   * Verifica si el token es válido y carga el usuario desde la App Madre
+   * Verifica si el token es válido y carga el usuario sincronizado con el Backend Hija
    */
   async function fetchUser() {
     if (!token.value) {
-      isReady.value = true
-      return
+      isReady.value = true;
+      return;
     }
 
     try {
+      // Intentar obtener el perfil. 
+      // Nota: MotherAuthService.getMyProfile debería usar el axios configurado o su propia instancia.
       const userData = await MotherAuthService.getMyProfile()
       user.value = userData
-      // Guardamos respaldo básico en localStorage por si acaso
+      sessionStorage.setItem('user_data', JSON.stringify(userData))
       localStorage.setItem('user_data', JSON.stringify(userData))
-    } catch (error) {
-      console.warn('Sesión expirada o inválida, o error al conectar con Madre')
-      // Si falla la validación del token, hacemos logout
+    } catch {
+      console.warn('Sesión expirada o inválida al intentar refrescar usuario')
       logout()
     } finally {
       isReady.value = true
@@ -88,20 +108,17 @@ export const useAuthStore = defineStore('auth', () => {
   }
 
   /**
-   * Helper para verificar permisos en la App Hija
+   * Helper estándar para verificar permisos
    */
   function can(permission) {
-    if (!user.value) return false
-
-    // Super Admin siempre puede todo
-    if (user.value.roles && user.value.roles.includes('Super Admin')) return true
-
-    // Verificar lista de permisos (si existe)
-    if (user.value.permissions && Array.isArray(user.value.permissions)) {
-      return user.value.permissions.includes(permission)
-    }
-
-    return false
+    if (!user.value) return false;
+    
+    // Super Admin siempre tiene acceso total
+    if (user.value.roles && user.value.roles.includes('Super Admin')) return true;
+    
+    // Fallback: soportar tanto 'permissions' como 'permisos' por compatibilidad con el ecosistema
+    const userPerms = user.value.permissions || user.value.permisos || [];
+    return userPerms.includes(permission);
   }
 
   /**
@@ -112,9 +129,14 @@ export const useAuthStore = defineStore('auth', () => {
     return user.value.roles && user.value.roles.includes(role)
   }
 
-  // Verificar autenticación al arrancar (si hay token)
+  // Verificar autenticación al arrancar
   async function checkAuth() {
-    await fetchUser()
+    if (token.value) {
+      axios.defaults.headers.common['Authorization'] = `Bearer ${token.value}`;
+      await fetchUser()
+    } else {
+      isReady.value = true
+    }
   }
 
   return {
@@ -122,9 +144,9 @@ export const useAuthStore = defineStore('auth', () => {
     token,
     processingSSO,
     isReady,
-    userAvatar, // Exported getter
+    userAvatar,
     login,
-    handleDirectToken,
+    handlePKCECallback,
     logout,
     fetchUser,
     checkAuth,

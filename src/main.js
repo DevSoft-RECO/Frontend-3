@@ -8,6 +8,7 @@ import router from './router';
 
 // 1. Importamos el Store
 import { useLayoutStore } from '@/stores/layout';
+import { startSessionGuards } from './utils/sessionGuards';
 
 const app = createApp(App);
 const pinia = createPinia(); // Creamos la instancia explícitamente
@@ -29,5 +30,8 @@ window.matchMedia("(prefers-color-scheme: dark)").addEventListener("change", () 
         layoutStore.initTheme();
     }
 });
+
+// 5. Iniciar guardianes de sesión
+startSessionGuards();
 
 app.mount('#app');

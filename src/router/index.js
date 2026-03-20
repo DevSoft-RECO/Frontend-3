@@ -112,8 +112,7 @@ router.beforeEach(async (to, from, next) => {
     if (!isAuthenticated) {
       console.log("🔒 Acceso Hija: Usuario sin sesión. Iniciando flujo SSO...");
       authStore.login();
-      // login() redirige a ventana completa, así que paramos aquí (aunque en SPA 'return' es suficiente)
-      return;
+      return next(false); // CRÍTICO: Bloqueamos a Vue Router mientras redirecciona
     }
   }
 
