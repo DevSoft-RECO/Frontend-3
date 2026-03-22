@@ -46,12 +46,9 @@ onMounted(async () => {
     subStatus.value =
       'Bienvenido a los sistemas internos de la Cooperativa YAMAN KUTX.'
 
-    // MODO DEPURACIÓN: Redirección automática desactivada para verificar respuesta
-    /*
     setTimeout(() => {
       router.push({ name: 'dashboard' })
     }, 900)
-    */
 
   } catch (e) {
     console.error(e)

@@ -10,17 +10,23 @@ const CLIENT_ID = import.meta.env.VITE_CLIENT_ID;
 const REDIRECT_URI = import.meta.env.VITE_REDIRECT_URI;
 
 export const useAuthStore = defineStore('auth', () => {
-  // MIGRACIÓN DE ALMACENAMIENTO (Limpia cachés viejas si cambias de arquitectura)
-  const STORAGE_VERSION = 'v2_pkce'; 
+  // MIGRACIÓN DE ALMACENAMIENTO (v3_prod: Borrado forzoso para evitar colisiones de caché)
+  const STORAGE_VERSION = 'v3_prod'; 
   if (localStorage.getItem('yk_storage_version') !== STORAGE_VERSION) {
-    localStorage.removeItem('access_token');
-    localStorage.removeItem('user_data');
-    sessionStorage.removeItem('user_data');
+    // Borrado forzoso de todo el storage relacionado para arrancar limpio
+    console.log("Detectada versión de sistema antigua. Realizando limpieza de seguridad...");
+    localStorage.clear();
+    sessionStorage.clear();
     localStorage.setItem('yk_storage_version', STORAGE_VERSION);
+    
+    // Forzar recarga si estamos en medio de una transición
+    if (window.location.pathname !== '/callback') {
+        window.location.reload();
+    }
   }
 
   // --- STATE ---
-  const user = ref(JSON.parse(sessionStorage.getItem('user_data') || 'null'))
+  const user = ref(JSON.parse(sessionStorage.getItem('user_data') || localStorage.getItem('user_data') || 'null'))
   const token = ref(localStorage.getItem('access_token') || null)
   const processingSSO = ref(false)
   const isReady = ref(false)
