@@ -1,33 +1,41 @@
 <template>
-  <div v-if="last_page > 1" class="flex items-center justify-between border-t border-gray-200 bg-white px-4 py-3 sm:px-6 dark:bg-gray-800 dark:border-gray-700">
+  <!-- Versión compatible: Siempre mostramos el contenedor si existe el objeto de paginación, 
+       pero ocultamos los controles si solo hay una página para no confundir, 
+       o los dejamos desactivados. Decidimos mostrar al menos la info de página. -->
+  <div class="flex items-center justify-between border-t border-gray-200 bg-white px-4 py-3 sm:px-6 dark:bg-gray-800 dark:border-gray-700" v-if="totalPages > 0">
+    
+    <!-- Mobile view: Simplificado (eliminamos sm:hidden si causa problemas, pero lo mantenemos con clases más estándar) -->
     <div class="flex flex-1 justify-between sm:hidden">
       <button
-        @click="$emit('change-page', current_page - 1)"
-        :disabled="current_page <= 1"
-        class="relative inline-flex items-center rounded-md border border-gray-300 bg-white px-4 py-2 text-sm font-medium text-gray-700 hover:bg-gray-50 disabled:opacity-50 dark:bg-gray-700 dark:text-gray-200 dark:border-gray-600 dark:hover:bg-gray-600"
+        @click="goToPage(currentPage - 1)"
+        :disabled="currentPage <= 1"
+        class="relative inline-flex items-center rounded-md border border-gray-300 bg-white px-4 py-2 text-sm font-medium text-gray-700 hover:bg-gray-50 disabled:opacity-50 dark:bg-gray-700 dark:text-gray-200 dark:border-gray-600"
       >
         Anterior
       </button>
       <button
-        @click="$emit('change-page', current_page + 1)"
-        :disabled="current_page >= last_page"
-        class="relative ml-3 inline-flex items-center rounded-md border border-gray-300 bg-white px-4 py-2 text-sm font-medium text-gray-700 hover:bg-gray-50 disabled:opacity-50 dark:bg-gray-700 dark:text-gray-200 dark:border-gray-600 dark:hover:bg-gray-600"
+        @click="goToPage(currentPage + 1)"
+        :disabled="currentPage >= totalPages"
+        class="relative ml-3 inline-flex items-center rounded-md border border-gray-300 bg-white px-4 py-2 text-sm font-medium text-gray-700 hover:bg-gray-50 disabled:opacity-50 dark:bg-gray-700 dark:text-gray-200 dark:border-gray-600"
       >
         Siguiente
       </button>
     </div>
+
+    <!-- Desktop view: Reemplazamos 'isolate' y simplificamos 'ring' -->
     <div class="hidden sm:flex sm:flex-1 sm:items-center sm:justify-between">
       <div>
         <p class="text-sm text-gray-700 dark:text-gray-300">
-          Página <span class="font-medium">{{ current_page }}</span> de <span class="font-medium">{{ last_page }}</span>
+          Página <span class="font-medium">{{ currentPage }}</span> de <span class="font-medium">{{ totalPages }}</span>
         </p>
       </div>
-      <div>
-        <nav class="isolate inline-flex -space-x-px rounded-md shadow-sm" aria-label="Pagination">
+      <div v-if="totalPages > 1">
+        <nav class="relative z-0 inline-flex shadow-sm -space-x-px rounded-md" aria-label="Pagination">
+          <!-- Previous Button -->
           <button
-            @click="$emit('change-page', current_page - 1)"
-            :disabled="current_page <= 1"
-            class="relative inline-flex items-center rounded-l-md px-2 py-2 text-gray-400 ring-1 ring-inset ring-gray-300 hover:bg-gray-50 focus:z-20 focus:outline-offset-0 disabled:opacity-50 dark:ring-gray-600 dark:hover:bg-gray-700"
+            @click="goToPage(currentPage - 1)"
+            :disabled="currentPage <= 1"
+            class="relative inline-flex items-center px-2 py-2 rounded-l-md border border-gray-300 bg-white text-sm font-medium text-gray-500 hover:bg-gray-50 disabled:opacity-50 dark:bg-gray-700 dark:border-gray-600 dark:text-gray-300"
           >
             <span class="sr-only">Anterior</span>
             <svg class="h-5 w-5" viewBox="0 0 20 20" fill="currentColor" aria-hidden="true">
@@ -35,24 +43,26 @@
             </svg>
           </button>
 
-          <!-- Simple pagination logic: Show previous, current, next -->
+          <!-- Numbered Pages -->
            <template v-for="page in pages" :key="page">
                 <button
-                    @click="$emit('change-page', page)"
+                    @click="goToPage(page)"
                     :class="[
-                        page === current_page
-                            ? 'relative z-10 inline-flex items-center bg-indigo-600 px-4 py-2 text-sm font-semibold text-white focus:z-20 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-600'
-                            : 'relative inline-flex items-center px-4 py-2 text-sm font-semibold text-gray-900 ring-1 ring-inset ring-gray-300 hover:bg-gray-50 focus:z-20 focus:outline-offset-0 dark:text-gray-200 dark:ring-gray-600 dark:hover:bg-gray-700'
+                        page === currentPage
+                            ? 'z-10 bg-indigo-600 text-white border-indigo-600'
+                            : 'bg-white border-gray-300 text-gray-500 hover:bg-gray-50 dark:bg-gray-700 dark:border-gray-600 dark:text-gray-300',
+                        'relative inline-flex items-center px-4 py-2 border text-sm font-medium'
                     ]"
                 >
                     {{ page }}
                 </button>
            </template>
 
+          <!-- Next Button -->
           <button
-            @click="$emit('change-page', current_page + 1)"
-            :disabled="current_page >= last_page"
-            class="relative inline-flex items-center rounded-r-md px-2 py-2 text-gray-400 ring-1 ring-inset ring-gray-300 hover:bg-gray-50 focus:z-20 focus:outline-offset-0 disabled:opacity-50 dark:ring-gray-600 dark:hover:bg-gray-700"
+            @click="goToPage(currentPage + 1)"
+            :disabled="currentPage >= totalPages"
+            class="relative inline-flex items-center px-2 py-2 rounded-r-md border border-gray-300 bg-white text-sm font-medium text-gray-500 hover:bg-gray-50 disabled:opacity-50 dark:bg-gray-700 dark:border-gray-600 dark:text-gray-300"
           >
             <span class="sr-only">Siguiente</span>
             <svg class="h-5 w-5" viewBox="0 0 20 20" fill="currentColor" aria-hidden="true">
@@ -69,17 +79,29 @@
 import { computed } from 'vue'
 
 const props = defineProps({
-    current_page: { type: Number, required: true },
-    last_page: { type: Number, required: true }
+    current_page: { type: [Number, String], default: 1 },
+    last_page: { type: [Number, String], default: 1 }
 })
 
-defineEmits(['change-page'])
+const emit = defineEmits(['change-page'])
+
+// Aseguramos que trabajamos con números
+const currentPage = computed(() => parseInt(props.current_page) || 1)
+const totalPages = computed(() => parseInt(props.last_page) || 1)
+
+const goToPage = (page) => {
+    if (page >= 1 && page <= totalPages.value) {
+        emit('change-page', page)
+    }
+}
 
 const pages = computed(() => {
-    let start = Math.max(1, props.current_page - 2)
-    let end = Math.min(props.last_page, start + 4)
+    const current = currentPage.value
+    const last = totalPages.value
+    
+    let start = Math.max(1, current - 2)
+    let end = Math.min(last, start + 4)
 
-    // Adjust start if end is maxed out
     if (end - start < 4) {
         start = Math.max(1, end - 4)
     }
@@ -91,3 +113,4 @@ const pages = computed(() => {
     return range
 })
 </script>
+

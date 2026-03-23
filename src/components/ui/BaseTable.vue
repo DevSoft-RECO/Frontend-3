@@ -95,14 +95,15 @@
         </div>
     </div>
 
-    <!-- PAGINATION -->
-    <BasePagination
-        v-if="pagination"
-        :current_page="pagination.current_page"
-        :last_page="pagination.last_page"
-        @change-page="$emit('change-page', $event)"
-        class="mt-4 rounded-lg overflow-hidden border border-gray-200 dark:border-gray-700"
-    />
+    <!-- PAGINATION AREA -->
+    <div v-if="pagination" class="mt-4">
+        <BasePagination
+            :current_page="pagination.current_page"
+            :last_page="pagination.last_page"
+            @change-page="$emit('change-page', $event)"
+            class="rounded-lg overflow-hidden border border-gray-200 dark:border-gray-700 shadow-sm"
+        />
+    </div>
   </div>
 </template>
 
