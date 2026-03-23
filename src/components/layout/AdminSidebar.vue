@@ -194,7 +194,7 @@ const menuItems = computed(() => {
     ]
 
     // Solo mostrar si tiene permiso
-    if (authStore.can('gestionar_solicitudes') || authStore.can('admin_mercadeo')) {
+    if (authStore.hasPermission('gestionar_solicitudes') || authStore.hasPermission('admin_mercadeo')) {
         items.push({
             id: 'mis-solicitudes',
             label: 'Mis Solicitudes',
@@ -207,7 +207,7 @@ const menuItems = computed(() => {
 
     // Admin Group: Adm. Solicitudes y Facturas
     // Solo visible si tiene permiso 'admin_mercadeo'
-    if (authStore.can('admin_mercadeo')) {
+    if (authStore.hasPermission('admin_mercadeo')) {
         items.push({
             id: 'admin-solicitudes',
             label: 'Adm. Solicitudes',
@@ -231,7 +231,7 @@ const menuItems = computed(() => {
     }
 
     // Auditoría Group
-    if (authStore.can('auditoria')) {
+    if (authStore.hasPermission('auditoria')) {
         items.push({
             id: 'auditoria',
             label: 'Auditoría',

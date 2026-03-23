@@ -97,7 +97,8 @@ const showRechazo = ref(false)
 const rechazoReason = ref('')
 
 const isSuperAdmin = computed(() => authStore.hasRole('Super Admin'))
-const canManage = computed(() => isSuperAdmin.value || authStore.can('admin_mercadeo'))
+const canManage = computed(() => isSuperAdmin.value || authStore.hasPermission('admin_mercadeo'))
+
 const canEditHistory = computed(() => isSuperAdmin.value)
 const isPending = computed(() => props.request.estado === 'SOLICITADO' && canManage.value)
 

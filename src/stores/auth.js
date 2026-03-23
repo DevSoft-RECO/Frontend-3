@@ -10,19 +10,16 @@ const CLIENT_ID = import.meta.env.VITE_CLIENT_ID;
 const REDIRECT_URI = import.meta.env.VITE_REDIRECT_URI;
 
 export const useAuthStore = defineStore('auth', () => {
-  // MIGRACIÓN DE ALMACENAMIENTO (v3_prod: Borrado forzoso para evitar colisiones de caché)
-  const STORAGE_VERSION = 'v3_prod'; 
+  // MIGRACIÓN DE ALMACENAMIENTO (v3_app3_clean: Borrado forzoso)
+  const STORAGE_VERSION = 'v3_app3_clean'; 
   if (localStorage.getItem('yk_storage_version') !== STORAGE_VERSION) {
-    // Borrado forzoso de todo el storage relacionado para arrancar limpio
-    console.log("Detectada versión de sistema antigua. Realizando limpieza de seguridad...");
-    localStorage.clear();
-    sessionStorage.clear();
+    const keysToRemove = ['access_token', 'user_data', 'pkce_verifier'];
+    keysToRemove.forEach(k => {
+      localStorage.removeItem(k);
+      sessionStorage.removeItem(k);
+    });
     localStorage.setItem('yk_storage_version', STORAGE_VERSION);
-    
-    // Forzar recarga si estamos en medio de una transición
-    if (window.location.pathname !== '/callback') {
-        window.location.reload();
-    }
+    if (window.location.pathname !== '/callback') window.location.reload();
   }
 
   // --- STATE ---
@@ -58,11 +55,9 @@ export const useAuthStore = defineStore('auth', () => {
       token.value = response.data.access_token;
       localStorage.setItem('access_token', token.value);
       sessionStorage.removeItem('pkce_verifier');
+      processingSSO.value = false; // Resetear el estado de procesamiento SSO
 
-      // Configurar el header de Authorization para las siguientes peticiones
-      axios.defaults.headers.common['Authorization'] = `Bearer ${token.value}`;
-
-      await fetchUser();
+      await fetchUser(true); // Forzar descarga de perfil limpio tras login
     } catch {
       console.error('Fallo al canjear PKCE o cargar usuario');
       throw new Error('PKCE_EXCHANGE_FAILED');
@@ -74,9 +69,13 @@ export const useAuthStore = defineStore('auth', () => {
   /**
    * Inicia el flujo de redirección a la Madre con PKCE
    */
-  async function login() {
-    processingSSO.value = true
-    await AuthService.login()
+  async function login(redirectTo = null) {
+    if (processingSSO.value) return; // Evitar múltiples redirecciones
+    processingSSO.value = true;
+    if (redirectTo) {
+      sessionStorage.setItem('auth_redirect_to', redirectTo);
+    }
+    await AuthService.login();
   }
 
   /**
@@ -92,15 +91,20 @@ export const useAuthStore = defineStore('auth', () => {
   /**
    * Verifica si el token es válido y carga el usuario sincronizado con el Backend Hija
    */
-  async function fetchUser() {
+  async function fetchUser(force = false) {
     if (!token.value) {
       isReady.value = true;
       return;
     }
 
+    // Si ya tenemos el usuario cargado, no volvemos a pedirlo a menos que se fuerce
+    if (!force && user.value) {
+      isReady.value = true;
+      return;
+    }
+
     try {
-      // Intentar obtener el perfil. 
-      // Nota: MotherAuthService.getMyProfile debería usar el axios configurado o su propia instancia.
+      // Intentar obtener el perfil sincronizado con el Backend Hija (JIT)
       const userData = await MotherAuthService.getMyProfile()
       user.value = userData
       sessionStorage.setItem('user_data', JSON.stringify(userData))
@@ -116,7 +120,7 @@ export const useAuthStore = defineStore('auth', () => {
   /**
    * Helper estándar para verificar permisos
    */
-  function can(permission) {
+  function hasPermission(permission) {
     if (!user.value) return false;
     
     // Super Admin siempre tiene acceso total
@@ -156,7 +160,9 @@ export const useAuthStore = defineStore('auth', () => {
     logout,
     fetchUser,
     checkAuth,
-    can,
+    hasPermission,
+    can: hasPermission,
     hasRole
   }
 })
+

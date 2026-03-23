@@ -21,7 +21,7 @@
 
       <!-- STATS CARDS -->
       <!-- STATS CARDS -->
-      <template v-if="authStore.can('admin_mercadeo')">
+      <template v-if="authStore.hasPermission('admin_mercadeo')">
         <div v-if="dashboardStore.loading" class="grid grid-cols-1 md:grid-cols-5 gap-4">
             <div v-for="i in 5" :key="i" class="h-32 bg-gray-200 dark:bg-gray-700 rounded-lg animate-pulse"></div>
         </div>
@@ -150,7 +150,7 @@
               <h3 class="text-lg font-bold text-gray-800 dark:text-white mb-4">Accesos Directos</h3>
               <div class="space-y-3">
                   <router-link
-                      v-if="authStore.can('gestionar_solicitudes') || authStore.can('admin_mercadeo')"
+                      v-if="authStore.hasPermission('gestionar_solicitudes') || authStore.hasPermission('admin_mercadeo')"
                       to="/admin/solicitudes/crear"
                       class="block w-full text-left p-3 rounded-lg bg-blue-50 text-blue-700 hover:bg-blue-100 dark:bg-blue-900/20 dark:text-blue-300 dark:hover:bg-blue-900/30 transition flex items-center gap-3"
                   >
@@ -229,8 +229,8 @@ const myUpcomingEvents = computed(() => dashboardStore.myUpcomingEvents)
 
 // Tabs Logic
 const activeTab = ref('general')
-const canViewGeneral = computed(() => authStore.can('admin_mercadeo'))
-const canViewAgency = computed(() => authStore.can('gestionar_solicitudes'))
+const canViewGeneral = computed(() => authStore.hasPermission('admin_mercadeo'))
+const canViewAgency = computed(() => authStore.hasPermission('gestionar_solicitudes'))
 
 const showTabs = computed(() => canViewGeneral.value && canViewAgency.value)
 
@@ -263,7 +263,7 @@ const getStatusClass = (status) => {
             status === 'RECHAZADO' ? 'bg-red-100 text-red-800 dark:bg-red-900/30 dark:text-red-300' : 'bg-gray-100'
 }
 
-const canInteract = computed(() => authStore.can('admin_mercadeo'));
+const canInteract = computed(() => authStore.hasPermission('admin_mercadeo'));
 
 // Actions
 const openIdsModal = (status, ids) => {

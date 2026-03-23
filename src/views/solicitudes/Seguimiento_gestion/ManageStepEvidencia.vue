@@ -74,7 +74,8 @@ const isEditing = ref(false)
 const file = ref(null)
 
 const isSuperAdmin = computed(() => authStore.hasRole('Super Admin'))
-const canManage = computed(() => isSuperAdmin.value || authStore.can('gestionar_solicitudes'))
+const canManage = computed(() => isSuperAdmin.value || authStore.hasPermission('gestionar_solicitudes'))
+
 const isPending = computed(() => props.request.estado === 'APROBADO' && canManage.value)
 
 const handleFile = (e) => file.value = e.target.files[0]

@@ -111,7 +111,7 @@ router.beforeEach(async (to, from, next) => {
   if (to.matched.some(record => record.meta.requiresAuth) || to.path === '/') {
     if (!isAuthenticated) {
       console.log("🔒 Acceso Hija: Usuario sin sesión. Iniciando flujo SSO...");
-      authStore.login();
+      authStore.login(to.fullPath); // Guardar URL original
       return next(false); // CRÍTICO: Bloqueamos a Vue Router mientras redirecciona
     }
   }
@@ -119,23 +119,25 @@ router.beforeEach(async (to, from, next) => {
   // Caso 2: Estamos autenticados, verificar identidad y permisos
   if (isAuthenticated) {
     // Asegurar que el usuario esté cargado
-    if (!authStore.isReady) {
+    if (!authStore.isReady || !authStore.user) {
       try {
         await authStore.fetchUser();
       } catch {
-        // Si falla, el store ya maneja el logout, pero detenemos navegación
-        return;
+        // RE-AUTENTICACIÓN FLUIDA: 
+        // Si el token falló, intentamos PKCE silencioso antes de rendirnos
+        authStore.login(to.fullPath);
+        return next(false);
       }
     }
 
-
     // Verificar Permiso
-    if (to.meta.permission && !authStore.can(to.meta.permission)) {
+    if (to.meta.permission && !authStore.hasPermission(to.meta.permission)) {
       const motherAppUrl = import.meta.env.VITE_MOTHER_APP_URL || 'http://localhost:5173';
       console.warn(`⛔ Acceso denegado: Usuario no tiene el permiso '${to.meta.permission}'. Redirigiendo a App Madre...`);
       window.location.href = `${motherAppUrl}/apps`;
       return;
     }
+
 
     // Verificar Rol
     if (to.meta.role && !authStore.hasRole(to.meta.role)) {
