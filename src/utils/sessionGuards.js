@@ -1,3 +1,4 @@
+import motherApi from '../api/axios-mother';
 import Swal from 'sweetalert2';
 
 export const startSessionGuards = () => {
@@ -5,24 +6,24 @@ export const startSessionGuards = () => {
   // REGLA A: EL "HEARTBEAT" CADA 5 MINUTOS (Vigilante)
   // ----------------------------------------------------
   setInterval(() => {
-    const token = localStorage.getItem('access_token');
+    const token = sessionStorage.getItem('access_token');
     if (token) {
       // Un sub-proceso silencioso a la Madre para verificar si la sesión sigue viva allá.
-      const motherApi = import.meta.env.VITE_MOTHER_API_URL || 'http://localhost:8000';
-      // Usamos una petición simple a /api/me de la madre
-      fetch(`${motherApi}/api/me`, {
-        headers: {
-          'Authorization': `Bearer ${token}`,
-          'Accept': 'application/json'
-        }
-      }).then(response => {
-        if (response.status === 401) {
-          console.log('El heartbeat detectó sesión caída en la Madre.');
-          localStorage.removeItem('access_token');
-          sessionStorage.clear();
-          window.location.reload(); // Esto disparará el guardián de rutas
-        }
-      }).catch(() => console.log('Error en comunicación con la Madre (Heartbeat)'));
+      // Usamos motherApi que ya tiene los interceptores y el Token
+      motherApi.get('/api/me')
+        .then(() => {
+           // Si llegamos aquí, la sesión está viva.
+        })
+        .catch(error => {
+          if (error.response && error.response.status === 401) {
+            console.log('El heartbeat detectó sesión caída en la Madre.');
+            sessionStorage.removeItem('access_token');
+            sessionStorage.clear();
+            window.location.reload(); // Esto disparará el guardián de rutas y el login SSO
+          } else {
+            console.warn('Error en comunicación con la Madre (Heartbeat)', error);
+          }
+        });
     }
   }, 5 * 60 * 1000);
 
@@ -36,7 +37,7 @@ export const startSessionGuards = () => {
   if (now < alertTime) {
     const msUntilAlert = alertTime.getTime() - now.getTime();
     setTimeout(() => {
-      if (localStorage.getItem('access_token')) {
+      if (sessionStorage.getItem('access_token')) {
         Swal.fire({
           toast: true,
           position: 'top-end',

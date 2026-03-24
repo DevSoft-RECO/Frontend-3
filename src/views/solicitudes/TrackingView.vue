@@ -197,7 +197,7 @@ const closeModal = () => {
 }
 
 const exportCsv = () => {
-    const token = localStorage.getItem('access_token')
+    const token = sessionStorage.getItem('access_token')
     const baseUrl = import.meta.env.VITE_API_URL || 'http://localhost:8000'
     const url = `${baseUrl}/api/solicitudes/export/csv`
 

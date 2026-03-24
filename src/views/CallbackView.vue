@@ -17,7 +17,6 @@ let isProcessingCallback = false;
 
 onMounted(async () => {
   if (isProcessingCallback) {
-      console.warn("Callback ya en proceso, ignorando peticiones repetidas.");
       return;
   }
   isProcessingCallback = true;

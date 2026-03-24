@@ -10,8 +10,9 @@ const CLIENT_ID = import.meta.env.VITE_CLIENT_ID;
 const REDIRECT_URI = import.meta.env.VITE_REDIRECT_URI;
 
 export const useAuthStore = defineStore('auth', () => {
-  // MIGRACIÓN DE ALMACENAMIENTO (v3_app3_clean: Borrado forzoso)
+  // MIGRACIÓN DE ALMACENAMIENTO (v3_app3_clean: Borrado forzoso de localStorage antiguo)
   const STORAGE_VERSION = 'v3_app3_clean'; 
+
   if (localStorage.getItem('yk_storage_version') !== STORAGE_VERSION) {
     const keysToRemove = ['access_token', 'user_data', 'pkce_verifier'];
     keysToRemove.forEach(k => {
@@ -23,8 +24,9 @@ export const useAuthStore = defineStore('auth', () => {
   }
 
   // --- STATE ---
-  const user = ref(JSON.parse(sessionStorage.getItem('user_data') || localStorage.getItem('user_data') || 'null'))
-  const token = ref(localStorage.getItem('access_token') || null)
+  // AHORA: Usamos preferentemente sessionStorage para seguridad (vuela al cerrar pestaña)
+  const user = ref(JSON.parse(sessionStorage.getItem('user_data') || 'null'))
+  const token = ref(sessionStorage.getItem('access_token') || null)
   const processingSSO = ref(false)
   const isReady = ref(false)
 
@@ -41,7 +43,9 @@ export const useAuthStore = defineStore('auth', () => {
   async function handlePKCECallback(code) {
     processingSSO.value = true;
     const verifier = sessionStorage.getItem('pkce_verifier')
-    if (!verifier) throw new Error('No se encontró el verifier PKCE')
+    if (!verifier) {
+      throw new Error('No se encontró el verifier PKCE');
+    }
 
     try {
       const response = await axios.post(`${MOTHER_API_URL}/oauth/token`, {
@@ -53,13 +57,13 @@ export const useAuthStore = defineStore('auth', () => {
       });
 
       token.value = response.data.access_token;
-      localStorage.setItem('access_token', token.value);
+      
+      sessionStorage.setItem('access_token', token.value);
       sessionStorage.removeItem('pkce_verifier');
-      processingSSO.value = false; // Resetear el estado de procesamiento SSO
+      processingSSO.value = false;
 
-      await fetchUser(true); // Forzar descarga de perfil limpio tras login
+      await fetchUser(true); 
     } catch {
-      console.error('Fallo al canjear PKCE o cargar usuario');
       throw new Error('PKCE_EXCHANGE_FAILED');
     } finally {
       processingSSO.value = false;
@@ -70,7 +74,7 @@ export const useAuthStore = defineStore('auth', () => {
    * Inicia el flujo de redirección a la Madre con PKCE
    */
   async function login(redirectTo = null) {
-    if (processingSSO.value) return; // Evitar múltiples redirecciones
+    if (processingSSO.value) return; 
     processingSSO.value = true;
     if (redirectTo) {
       sessionStorage.setItem('auth_redirect_to', redirectTo);
@@ -79,7 +83,7 @@ export const useAuthStore = defineStore('auth', () => {
   }
 
   /**
-   * Cierra sesión local y redirige al backend
+   * Cierra sesión local
    */
   function logout() {
     user.value = null
@@ -89,29 +93,28 @@ export const useAuthStore = defineStore('auth', () => {
   }
 
   /**
-   * Verifica si el token es válido y carga el usuario sincronizado con el Backend Hija
+   * Obtiene usuario desde Backend LOCAL (que sincroniza JIT con la Madre)
+   * @param {Boolean} force Si es true, ignora la caché y descarga de nuevo
    */
   async function fetchUser(force = false) {
+    
     if (!token.value) {
       isReady.value = true;
       return;
     }
 
-    // Si ya tenemos el usuario cargado, no volvemos a pedirlo a menos que se fuerce
     if (!force && user.value) {
       isReady.value = true;
       return;
     }
 
     try {
-      // Intentar obtener el perfil sincronizado con el Backend Hija (JIT)
       const userData = await MotherAuthService.getMyProfile()
+      
       user.value = userData
       sessionStorage.setItem('user_data', JSON.stringify(userData))
-      localStorage.setItem('user_data', JSON.stringify(userData))
     } catch {
-      console.warn('Sesión expirada o inválida al intentar refrescar usuario')
-      logout()
+      logout() 
     } finally {
       isReady.value = true
     }

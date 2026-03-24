@@ -14,17 +14,12 @@ const api = axios.create({
 // Antes de que salga la petición, le pegamos el token si existe
 api.interceptors.request.use(
   (config) => {
-    const token = localStorage.getItem('access_token');
-
-    console.log(`[Axios Local] Preparando petición a: ${config.url}`);
+    const token = sessionStorage.getItem('access_token');
 
     if (token) {
-      console.log("[Axios Local] Token encontrado en localStorage. Agregando header Authorization.");
       // Aseguramos que no haya doble Bearer por si acaso
       const authHeader = token.startsWith('Bearer ') ? token : `Bearer ${token}`;
       config.headers.Authorization = authHeader;
-    } else {
-      console.warn("[Axios Local] ADVERTENCIA: No se encontró token en localStorage. La petición irá sin autenticación.");
     }
 
     return config;
@@ -37,12 +32,10 @@ api.interceptors.response.use(
   (response) => response,
   (error) => {
     if (error.response && error.response.status === 401) {
-      console.error('[Axios Local] Error 401. Sesión expirada o token rechazado.');
-      
-      localStorage.removeItem('access_token');
+      sessionStorage.removeItem('access_token');
       sessionStorage.clear();
       
-      // Intentar redirigir al login usando el AuthService
+      // Redirigir al login automáticamente
       import('@/services/AuthService').then(module => {
         module.default.login();
       });

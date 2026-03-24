@@ -123,8 +123,9 @@ router.beforeEach(async (to, from, next) => {
       try {
         await authStore.fetchUser();
       } catch {
-        // RE-AUTENTICACIÓN FLUIDA: 
+        // RE-AUTENTICACIÓN FLUIDA:
         // Si el token falló, intentamos PKCE silencioso antes de rendirnos
+        console.log("🔒 Re-autenticación fallida. Iniciando flujo SSO...");
         authStore.login(to.fullPath);
         return next(false);
       }
