@@ -1,8 +1,8 @@
 import { defineStore } from 'pinia'
 import { ref, computed } from 'vue'
 import axios from 'axios'
+import api from '../api/axios'
 import AuthService from '../services/AuthService'
-import MotherAuthService from '../services/MotherAuthService'
 import { getAvatarUrl } from '../utils/imageUtils'
 
 const MOTHER_API_URL = import.meta.env.VITE_MOTHER_API_URL || 'http://localhost:8000';
@@ -109,7 +109,8 @@ export const useAuthStore = defineStore('auth', () => {
     }
 
     try {
-      const userData = await MotherAuthService.getMyProfile()
+      const response = await api.get('/me')
+      const userData = response.data
       
       user.value = userData
       sessionStorage.setItem('user_data', JSON.stringify(userData))
