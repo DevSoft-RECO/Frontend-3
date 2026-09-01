@@ -41,23 +41,26 @@ const router = createRouter({
           path: 'dashboard',
           name: 'dashboard',
           component: DashboardView,
-          meta: { title: 'Modulo Mercadeo' } // Ejemplo: si necesitara permiso, agregar permission: 'ver_dashboard'
+          meta: { title: 'Modulo Mercadeo', permission: 'admin_mercadeo' }
         },
         // RUTAS SOLICITUDES
         {
           path: 'solicitudes/crear',
           name: 'solicitudes-crear',
-          component: CreateRequestView
+          component: CreateRequestView,
+          meta: { title: 'Gestionar Mis Solicitudes', permissionsAny: ['gestionar_solicitudes', 'admin_mercadeo'] }
         },
         {
           path: 'solicitudes/seguimiento',
           name: 'solicitudes-seguimiento',
-          component: TrackingView
+          component: TrackingView,
+          meta: { title: 'Bandeja de Entrada Solicitudes', permission: 'admin_mercadeo' }
         },
         {
           path: 'solicitudes/evidencias',
           name: 'solicitudes-evidencias',
-          component: EvidenceView
+          component: EvidenceView,
+          meta: { title: 'Evidencias', permissionsAny: ['gestionar_solicitudes', 'admin_mercadeo'] }
         },
         {
           path: 'solicitudes/auditoria',
@@ -68,23 +71,27 @@ const router = createRouter({
         {
           path: 'solicitudes/tipos-apoyo',
           name: 'tipos-apoyo',
-          component: () => import('@/views/solicitudes/TiposApoyoView.vue')
+          component: () => import('@/views/solicitudes/TiposApoyoView.vue'),
+          meta: { title: 'Tipos de Apoyo', permission: 'admin_mercadeo' }
         },
         {
           path: 'localidades',
           name: 'localidades',
-          component: () => import('@/views/solicitudes/LocalidadesView.vue')
+          component: () => import('@/views/solicitudes/LocalidadesView.vue'),
+          meta: { title: 'Gestión Localidades', permission: 'admin_mercadeo' }
         },
         // RUTAS FACTURAS
         {
           path: 'facturas/listado',
           name: 'facturas-listado',
-          component: () => import('@/views/Facturas/FacturasView.vue')
+          component: () => import('@/views/Facturas/FacturasView.vue'),
+          meta: { title: 'Listado Facturas', permission: 'admin_mercadeo' }
         },
         {
           path: 'facturas/categorias',
           name: 'facturas-categorias',
-          component: () => import('@/views/Facturas/CategoriasView.vue')
+          component: () => import('@/views/Facturas/CategoriasView.vue'),
+          meta: { title: 'Categorías Facturas', permission: 'admin_mercadeo' }
         },
         // MÓDULO LA CARTILLA GANADORA (ADMIN)
         {

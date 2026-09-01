@@ -184,14 +184,16 @@ const handleItemClick = () => {
 }
 
 const menuItems = computed(() => {
-    const items = [
-        {
+    const items = []
+
+    if (authStore.hasPermission('admin_mercadeo') || authStore.hasRole('Super Admin')) {
+        items.push({
             id: 'home',
             label: 'Dashboard',
             route: '/admin/dashboard',
             iconSvg: '<path stroke-linecap="round" stroke-linejoin="round" d="M3 12l2-2 7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2v10a1 1 0 01-1 1h-3m-4 0h4" />'
-        }
-    ]
+        })
+    }
 
     // Solo mostrar si tiene permiso
     if (authStore.hasPermission('gestionar_solicitudes') || authStore.hasPermission('admin_mercadeo')) {
