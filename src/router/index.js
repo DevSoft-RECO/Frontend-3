@@ -66,7 +66,7 @@ const router = createRouter({
           path: 'solicitudes/auditoria',
           name: 'solicitudes-auditoria',
           component: () => import('@/views/solicitudes/AuditView.vue'),
-          meta: { title: 'Auditoría General', permission: 'auditoria' }
+          meta: { title: 'Auditoría General', permission: 'auditoria_mercadeo' }
         },
         {
           path: 'solicitudes/tipos-apoyo',

@@ -46,8 +46,16 @@
         </svg>
       </button>
 
-      <!-- Usuario + Botón Retorno Directo (SIN DROPDOWN) -->
+      <!-- Usuario + Agencia + Botón Retorno Directo (SIN DROPDOWN) -->
       <div class="flex items-center gap-3">
+        <!-- Badge Agencia del Usuario -->
+        <div v-if="userAgenciaName" class="hidden sm:flex items-center gap-1.5 px-3 py-1 bg-emerald-500/10 border border-emerald-500/20 text-emerald-600 dark:text-emerald-400 rounded-xl text-xs font-bold">
+          <svg class="w-4 h-4 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5m0 0h4m-4 0v-4m0 4h4" />
+          </svg>
+          <span class="truncate max-w-[140px]" :title="userAgenciaName">{{ userAgenciaName }}</span>
+        </div>
+
         <div class="hidden md:block text-right">
           <p class="text-sm font-bold text-gray-700 dark:text-gray-200">
             {{ userName }}
@@ -92,13 +100,39 @@ import { computed, onMounted } from "vue"
 import { useRoute } from "vue-router"
 import { useLayoutStore } from "@/stores/layout"
 import { useAuthStore } from "@/stores/auth"
+import { useCartillaCatalogosStore } from "@/stores/cartilla/catalogos"
 
 const layoutStore = useLayoutStore()
 const authStore = useAuthStore()
+const catalogosStore = useCartillaCatalogosStore()
 const route = useRoute()
 
 // Datos del usuario (Reactivos al Pinia Store)
 const userName = computed(() => authStore.user?.name || "Usuario")
+
+// Agencia del Usuario
+const userAgenciaName = computed(() => {
+    // Si viene la relación directa o el objeto agencia en user
+    if (authStore.user?.agencia?.nombre) {
+        return authStore.user.agencia.nombre
+    }
+    if (authStore.user?.nombre_agencia) {
+        return authStore.user.nombre_agencia
+    }
+    
+    // Buscar en el catálogo de agencias
+    const codeOrId = authStore.user?.agencia_id || authStore.user?.idagencia
+    if (codeOrId && catalogosStore.agencias.length) {
+        const ag = catalogosStore.agencias.find(a => a.id == codeOrId || a.codigo === codeOrId)
+        if (ag) return ag.nombre
+    }
+
+    if (authStore.hasRole('Super Admin') || authStore.hasPermission('admin_mercadeo') || authStore.hasPermission('admin_promocion')) {
+        return 'Almacén Central'
+    }
+
+    return codeOrId ? `Agencia (${codeOrId})` : null
+})
 
 // CAMBIO AQUÍ: Usamos authStore.userAvatar que ya procesa la URL completa
 const userPhoto = computed(() => authStore.userAvatar || null)
@@ -131,6 +165,9 @@ const handleReturnToMother = () => {
 onMounted(async () => {
     if (!authStore.user && authStore.token) {
         await authStore.fetchUser()
+    }
+    if (!catalogosStore.agencias.length) {
+        catalogosStore.fetchAgencias()
     }
 })
 </script>

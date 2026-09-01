@@ -233,7 +233,7 @@ const menuItems = computed(() => {
     }
 
     // Auditoría Group
-    if (authStore.hasPermission('auditoria')) {
+    if (authStore.hasPermission('auditoria_mercadeo')) {
         items.push({
             id: 'auditoria',
             label: 'Auditoría',
