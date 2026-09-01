@@ -249,20 +249,39 @@ const procesarCsv = async () => {
 
   try {
     const res = await colocacionesStore.importarCsv(files[0])
+    fileInput.value.value = ''
+    buscar()
+
+    const d = res.descartes || {}
+    let detalleDescartes = ''
+    if (res.filas_elegibles === 0 && d) {
+      detalleDescartes = `
+        <div class="text-left text-xs space-y-1 mt-3 p-3 bg-gray-800 rounded-lg text-gray-300">
+          <p class="font-bold text-amber-400">Desglose de filas descartadas:</p>
+          <ul class="list-disc pl-4 space-y-0.5">
+            ${d.area_financiera_no_mapeada ? `<li>Área financiera no coincide con agencias: <b>${d.area_financiera_no_mapeada}</b></li>` : ''}
+            ${d.prefijo_no_coincide ? `<li>Prefijo de cuenta no coincide: <b>${d.prefijo_no_coincide}</b></li>` : ''}
+            ${d.no_puntual_pago_con_mora ? `<li>No son pagos puntuales (mora / fechas distintas): <b>${d.no_puntual_pago_con_mora}</b></li>` : ''}
+            ${d.fuera_rango_promocion ? `<li>Fecha de pago fuera de la promoción: <b>${d.fuera_rango_promocion}</b></li>` : ''}
+            ${d.ya_registrado ? `<li>Pagos ya registrados previamente: <b>${d.ya_registrado}</b></li>` : ''}
+            ${d.monto_invalido ? `<li>Monto menor o igual a cero: <b>${d.monto_invalido}</b></li>` : ''}
+          </ul>
+        </div>
+      `
+    }
+
     Swal.fire({
-      icon: 'success',
-      title: '¡Importación Completa!',
-      text: `Se leyeron ${res.total_filas} filas del CSV y se registraron ${res.filas_elegibles} pagos automáticos elegibles.`,
+      icon: res.filas_elegibles > 0 ? 'success' : 'info',
+      title: 'Proceso finalizado',
+      html: `Se leyeron <b>${res.total_filas}</b> filas del CSV y se registraron <b>${res.filas_elegibles}</b> pagos automáticos elegibles.${detalleDescartes}`,
       background: '#1f2937',
       color: '#fff'
     })
-    if (fileInput.value) fileInput.value.value = ''
-    buscar()
-  } catch (error) {
+  } catch (err) {
     Swal.fire({
       icon: 'error',
-      title: 'Error de Importación',
-      text: error.response?.data?.error || error.response?.data?.message || 'Ocurrió un error al procesar el CSV.',
+      title: 'Error en importación',
+      text: typeof err === 'string' ? err : 'Error al procesar el archivo CSV',
       background: '#1f2937',
       color: '#fff'
     })
