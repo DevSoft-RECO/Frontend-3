@@ -146,37 +146,37 @@ const router = createRouter({
           path: 'cartilla-agencia-dashboard',
           name: 'cartilla-agencia-dashboard',
           component: () => import('@/views/cartilla/DashboardAgenciaView.vue'),
-          meta: { title: 'Cartilla Agencia - Dashboard' }
+          meta: { title: 'Cartilla Agencia - Dashboard', permissionsAny: ['edicion_promocion_agencia', 'lectura_promocion_agencia', 'cartilla_operativo', 'cartilla_consultor', 'cartilla_mercadeo'] }
         },
         {
           path: 'cartilla-agencia-registros',
           name: 'cartilla-agencia-registros',
           component: () => import('@/views/cartilla/RegistrosAgenciaView.vue'),
-          meta: { title: 'Cartilla Agencia - Registros' }
+          meta: { title: 'Cartilla Agencia - Registros', permissionsAny: ['edicion_promocion_agencia', 'lectura_promocion_agencia', 'cartilla_operativo', 'cartilla_consultor', 'cartilla_mercadeo'] }
         },
         {
           path: 'cartilla-agencia-colocaciones',
           name: 'cartilla-agencia-colocaciones',
           component: () => import('@/views/cartilla/ColocacionesAgenciaView.vue'),
-          meta: { title: 'Cartilla Agencia - Pagos Automáticos' }
+          meta: { title: 'Cartilla Agencia - Pagos Automáticos', permissionsAny: ['edicion_promocion_agencia', 'lectura_promocion_agencia', 'cartilla_operativo', 'cartilla_consultor', 'cartilla_mercadeo'] }
         },
         {
           path: 'cartilla-agencia-historial-registros',
           name: 'cartilla-agencia-historial-registros',
           component: () => import('@/views/cartilla/HistorialRegistrosAgenciaView.vue'),
-          meta: { title: 'Cartilla Agencia - Historial Registros' }
+          meta: { title: 'Cartilla Agencia - Historial Registros', permissionsAny: ['edicion_promocion_agencia', 'lectura_promocion_agencia', 'cartilla_operativo', 'cartilla_consultor', 'cartilla_mercadeo'] }
         },
         {
           path: 'cartilla-agencia-inventario',
           name: 'cartilla-agencia-inventario',
           component: () => import('@/views/cartilla/InventarioAgenciaView.vue'),
-          meta: { title: 'Cartilla Agencia - Inventario' }
+          meta: { title: 'Cartilla Agencia - Inventario', permissionsAny: ['edicion_promocion_agencia', 'lectura_promocion_agencia', 'cartilla_operativo', 'cartilla_consultor', 'cartilla_mercadeo'] }
         },
         {
           path: 'cartilla-agencia-balance',
           name: 'cartilla-agencia-balance',
           component: () => import('@/views/cartilla/BalanceInventarioView.vue'),
-          meta: { title: 'Cartilla Agencia - Balance de Inventario' }
+          meta: { title: 'Cartilla Agencia - Balance de Inventario', permissionsAny: ['edicion_promocion_agencia', 'lectura_promocion_agencia', 'cartilla_operativo', 'cartilla_consultor', 'cartilla_mercadeo'] }
         }
       ]
     },
@@ -223,12 +223,23 @@ router.beforeEach(async (to, from, next) => {
       }
     }
 
-    // Verificar Permiso
+    // Verificar Permiso único
     if (to.meta.permission && !authStore.hasPermission(to.meta.permission)) {
       const motherAppUrl = import.meta.env.VITE_MOTHER_APP_URL || 'http://localhost:5173';
       console.warn(`⛔ Acceso denegado: Usuario no tiene el permiso '${to.meta.permission}'. Redirigiendo a App Madre...`);
       window.location.href = `${motherAppUrl}/apps`;
       return;
+    }
+
+    // Verificar Permisos opcionales (al menos uno)
+    if (to.meta.permissionsAny && Array.isArray(to.meta.permissionsAny)) {
+      const hasAny = to.meta.permissionsAny.some(p => authStore.hasPermission(p) || authStore.hasRole('Super Admin'))
+      if (!hasAny) {
+        const motherAppUrl = import.meta.env.VITE_MOTHER_APP_URL || 'http://localhost:5173';
+        console.warn(`⛔ Acceso denegado: Usuario no tiene ninguno de los permisos requeridos. Redirigiendo a App Madre...`);
+        window.location.href = `${motherAppUrl}/apps`;
+        return;
+      }
     }
 
 

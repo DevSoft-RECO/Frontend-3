@@ -101,11 +101,13 @@
 
         <template #cell-acciones="{ row }">
           <button
+            v-if="puedeEditar"
             @click="abrirReclamo(row)"
             class="px-3 py-1.5 bg-emerald-600 hover:bg-emerald-500 text-white font-bold rounded-lg text-xs cursor-pointer flex items-center gap-1"
           >
             <span>✨</span> Reclamar
           </button>
+          <span v-else class="text-xs text-gray-400 font-semibold italic">Solo lectura</span>
         </template>
       </BaseTable>
 
@@ -130,13 +132,22 @@
 </template>
 
 <script setup>
-import { ref, reactive, onMounted } from 'vue'
+import { ref, reactive, computed, onMounted } from 'vue'
 import { useColocacionesStore } from '@/stores/cartilla/colocaciones'
+import { useAuthStore } from '@/stores/auth'
 import BaseTable from '@/components/ui/BaseTable.vue'
 import BasePagination from '@/components/ui/BasePagination.vue'
 import ReclamarModal from './components/ReclamarModal.vue'
 
 const colocacionesStore = useColocacionesStore()
+const authStore = useAuthStore()
+
+const puedeEditar = computed(() => {
+  return authStore.hasPermission('edicion_promocion_agencia') ||
+         authStore.hasPermission('cartilla_operativo') ||
+         authStore.hasPermission('cartilla_mercadeo') ||
+         authStore.hasRole('Super Admin')
+})
 
 const modalReclamoShow = ref(false)
 const pagoSeleccionado = ref(null)

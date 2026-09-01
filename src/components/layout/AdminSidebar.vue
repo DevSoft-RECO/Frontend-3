@@ -263,7 +263,7 @@ const menuItems = computed(() => {
     }
 
     // Grupo Cartilla Ganadora agencias
-    if (authStore.hasPermission('cartilla_operativo') || authStore.hasPermission('cartilla_consultor') || authStore.hasPermission('cartilla_mercadeo') || authStore.hasRole('Super Admin')) {
+    if (authStore.hasPermission('edicion_promocion_agencia') || authStore.hasPermission('lectura_promocion_agencia') || authStore.hasPermission('cartilla_operativo') || authStore.hasPermission('cartilla_consultor') || authStore.hasPermission('cartilla_mercadeo') || authStore.hasRole('Super Admin')) {
         items.push({
             id: 'cartilla-ganadora-agencias',
             label: 'Cartilla Ganadora agencias',

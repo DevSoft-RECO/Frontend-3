@@ -12,6 +12,7 @@
       </div>
 
       <button
+        v-if="puedeEditar"
         @click="abrirModalNuevo"
         class="px-5 py-2.5 bg-emerald-600 hover:bg-emerald-500 active:bg-emerald-700 text-white font-bold rounded-xl text-sm flex items-center gap-2 cursor-pointer transition-colors shadow-lg shadow-emerald-900/20"
       >
@@ -133,7 +134,7 @@
         </template>
 
         <template #cell-acciones="{ row }">
-          <div class="flex justify-end gap-2">
+          <div v-if="puedeEditar" class="flex justify-end gap-2">
             <button
               @click="abrirModalEditar(row)"
               class="p-1.5 hover:bg-gray-100 dark:hover:bg-gray-800 rounded-lg text-amber-600 dark:text-amber-400 cursor-pointer"
@@ -149,6 +150,7 @@
               🗑️
             </button>
           </div>
+          <span v-else class="text-xs text-gray-400 font-semibold italic">Solo lectura</span>
         </template>
       </BaseTable>
 
@@ -174,9 +176,10 @@
 </template>
 
 <script setup>
-import { ref, onMounted } from 'vue'
+import { ref, computed, onMounted } from 'vue'
 import { useCartillaRegistrosStore } from '@/stores/cartilla/registros'
 import { useCartillaCatalogosStore } from '@/stores/cartilla/catalogos'
+import { useAuthStore } from '@/stores/auth'
 import BaseTable from '@/components/ui/BaseTable.vue'
 import BasePagination from '@/components/ui/BasePagination.vue'
 import RegistroModal from './components/RegistroModal.vue'
@@ -184,6 +187,14 @@ import Swal from 'sweetalert2'
 
 const registrosStore = useCartillaRegistrosStore()
 const catalogosStore = useCartillaCatalogosStore()
+const authStore = useAuthStore()
+
+const puedeEditar = computed(() => {
+  return authStore.hasPermission('edicion_promocion_agencia') ||
+         authStore.hasPermission('cartilla_operativo') ||
+         authStore.hasPermission('cartilla_mercadeo') ||
+         authStore.hasRole('Super Admin')
+})
 
 const filtros = ref({
   accion: '',

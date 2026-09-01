@@ -19,6 +19,7 @@
           <span>🔄</span> Refrescar Datos
         </button>
         <button
+          v-if="puedeEditar"
           @click="modalReposicionShow = true"
           class="px-4 py-2 bg-emerald-600 hover:bg-emerald-500 text-white font-bold rounded-xl text-sm cursor-pointer flex items-center gap-2 shadow-lg shadow-emerald-900/20"
         >
@@ -160,6 +161,13 @@ import ReposicionCartillaModal from './components/ReposicionCartillaModal.vue'
 
 const inventarioStore = useCartillaInventarioStore()
 const authStore = useAuthStore()
+
+const puedeEditar = computed(() => {
+  return authStore.hasPermission('edicion_promocion_agencia') ||
+         authStore.hasPermission('cartilla_operativo') ||
+         authStore.hasPermission('cartilla_mercadeo') ||
+         authStore.hasRole('Super Admin')
+})
 
 const modalReposicionShow = ref(false)
 
