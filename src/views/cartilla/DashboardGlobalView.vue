@@ -139,7 +139,7 @@
     </div>
 
     <!-- TARJETAS DE SORTEOS Y PARTICIPACIONES GLOBALES -->
-    <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+    <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
       <div class="bg-gradient-to-br from-emerald-600 to-teal-800 text-white p-6 rounded-2xl shadow-xl flex items-center justify-between">
         <div>
           <p class="text-xs font-black uppercase tracking-wider text-emerald-200">Participaciones Totales</p>
@@ -147,17 +147,6 @@
           <p class="text-xs text-emerald-100 mt-1 font-medium">Asociados participantes en el sistema</p>
         </div>
         <span class="text-4xl opacity-80">📝</span>
-      </div>
-
-      <div class="bg-gradient-to-br from-blue-600 to-indigo-800 text-white p-6 rounded-2xl shadow-xl flex items-center justify-between">
-        <div>
-          <p class="text-xs font-black uppercase tracking-wider text-blue-200">Monto Colocado Global</p>
-          <h3 class="text-3xl font-black mt-1">
-            Q {{ Number(data.resumen_participaciones?.total_monto ?? 0).toLocaleString('es-GT', { minimumFractionDigits: 2 }) }}
-          </h3>
-          <p class="text-xs text-blue-100 mt-1 font-medium">Generado en todas las sedes</p>
-        </div>
-        <span class="text-4xl opacity-80">💰</span>
       </div>
 
       <div
