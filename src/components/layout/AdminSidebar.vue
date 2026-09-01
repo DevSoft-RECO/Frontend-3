@@ -242,8 +242,8 @@ const menuItems = computed(() => {
         })
     }
 
-    // Grupo Cartilla Ganadora
-    if (authStore.hasPermission('cartilla_mercadeo')) {
+    // Grupo Cartilla Ganadora (Admin)
+    if (authStore.hasPermission('admin_promocion') || authStore.hasPermission('cartilla_mercadeo') || authStore.hasRole('Super Admin')) {
         items.push({
             id: 'cartilla-ganadora',
             label: 'Cartilla Ganadora',
