@@ -16,7 +16,7 @@
 
   <aside
     class="fixed inset-y-0 left-0 z-50 flex flex-col transition-all duration-300 shadow-2xl
-           bg-gray-900 border-r border-gray-800"
+           bg-gray-900 border-r border-gray-800 print:hidden"
     :class="[
       layoutStore.isSidebarOpen ? 'translate-x-0' : '-translate-x-full md:translate-x-0',
       layoutStore.isCollapsed ? 'w-20' : 'w-72'

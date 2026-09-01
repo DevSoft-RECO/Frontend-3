@@ -3,7 +3,7 @@
     class="sticky top-0 z-30 flex h-16 w-full items-center justify-between px-6
            bg-white dark:bg-gray-800
            border-b-2 border-emerald-500
-           shadow-sm transition-colors duration-300"
+           shadow-sm transition-colors duration-300 print:hidden"
   >
     <div class="flex items-center gap-4">
       <button

@@ -29,12 +29,12 @@
 
     <!-- Contenido -->
     <div
-      class="flex flex-col flex-1 min-w-0"
+      class="flex flex-col flex-1 min-w-0 print:ml-0"
       :class="[layoutStore.isCollapsed ? 'md:ml-20' : 'md:ml-[18rem]']"
     >
       <AdminHeader />
 
-      <main class="flex-1 overflow-x-hidden overflow-y-auto p-6 relative custom-scrollbar">
+      <main class="flex-1 overflow-x-hidden overflow-y-auto p-6 print:p-0 relative custom-scrollbar">
         <RouterView v-slot="{ Component }">
           <Transition
             enter-active-class="transition ease-out duration-200"
