@@ -85,6 +85,98 @@ const router = createRouter({
           path: 'facturas/categorias',
           name: 'facturas-categorias',
           component: () => import('@/views/Facturas/CategoriasView.vue')
+        },
+        // MÓDULO LA CARTILLA GANADORA (ADMIN)
+        {
+          path: 'cartilla-dashboard',
+          name: 'cartilla-dashboard',
+          component: () => import('@/views/cartilla/DashboardGlobalView.vue'),
+          meta: { title: 'Cartilla - Dashboard General', permission: 'cartilla_mercadeo' }
+        },
+        {
+          path: 'cartilla-registros',
+          name: 'cartilla-registros',
+          component: () => import('@/views/cartilla/RegistrosView.vue'),
+          meta: { title: 'Cartilla - Registros', permission: 'cartilla_mercadeo' }
+        },
+        {
+          path: 'cartilla-historial-registros',
+          name: 'cartilla-historial-registros',
+          component: () => import('@/views/cartilla/HistorialRegistrosView.vue'),
+          meta: { title: 'Cartilla - Historial Registros', permission: 'cartilla_mercadeo' }
+        },
+        {
+          path: 'cartilla-inventario',
+          name: 'cartilla-inventario',
+          component: () => import('@/views/cartilla/InventarioView.vue'),
+          meta: { title: 'Cartilla - Inventario Central', permission: 'cartilla_mercadeo' }
+        },
+        {
+          path: 'cartilla-balance',
+          name: 'cartilla-balance',
+          component: () => import('@/views/cartilla/BalanceInventarioView.vue'),
+          meta: { title: 'Cartilla - Balance de Inventario', permission: 'cartilla_mercadeo' }
+        },
+        {
+          path: 'cartilla-historial-inventario',
+          name: 'cartilla-historial-inventario',
+          component: () => import('@/views/cartilla/HistorialInventarioView.vue'),
+          meta: { title: 'Cartilla - Historial Inventario', permission: 'cartilla_mercadeo' }
+        },
+        {
+          path: 'cartilla-exportaciones',
+          name: 'cartilla-exportaciones',
+          component: () => import('@/views/cartilla/ExportacionesView.vue'),
+          meta: { title: 'Cartilla - Exportaciones', permission: 'cartilla_mercadeo' }
+        },
+        {
+          path: 'cartilla-colocaciones',
+          name: 'cartilla-colocaciones',
+          component: () => import('@/views/cartilla/ColocacionesView.vue'),
+          meta: { title: 'Cartilla - Colocaciones', permission: 'cartilla_mercadeo' }
+        },
+        {
+          path: 'cartilla-configuracion',
+          name: 'cartilla-configuracion',
+          component: () => import('@/views/cartilla/ConfiguracionView.vue'),
+          meta: { title: 'Cartilla - Configuración', permission: 'cartilla_mercadeo' }
+        },
+        // MÓDULO LA CARTILLA GANADORA (AGENCIAS)
+        {
+          path: 'cartilla-agencia-dashboard',
+          name: 'cartilla-agencia-dashboard',
+          component: () => import('@/views/cartilla/DashboardAgenciaView.vue'),
+          meta: { title: 'Cartilla Agencia - Dashboard' }
+        },
+        {
+          path: 'cartilla-agencia-registros',
+          name: 'cartilla-agencia-registros',
+          component: () => import('@/views/cartilla/RegistrosAgenciaView.vue'),
+          meta: { title: 'Cartilla Agencia - Registros' }
+        },
+        {
+          path: 'cartilla-agencia-colocaciones',
+          name: 'cartilla-agencia-colocaciones',
+          component: () => import('@/views/cartilla/ColocacionesAgenciaView.vue'),
+          meta: { title: 'Cartilla Agencia - Pagos Automáticos' }
+        },
+        {
+          path: 'cartilla-agencia-historial-registros',
+          name: 'cartilla-agencia-historial-registros',
+          component: () => import('@/views/cartilla/HistorialRegistrosAgenciaView.vue'),
+          meta: { title: 'Cartilla Agencia - Historial Registros' }
+        },
+        {
+          path: 'cartilla-agencia-inventario',
+          name: 'cartilla-agencia-inventario',
+          component: () => import('@/views/cartilla/InventarioAgenciaView.vue'),
+          meta: { title: 'Cartilla Agencia - Inventario' }
+        },
+        {
+          path: 'cartilla-agencia-balance',
+          name: 'cartilla-agencia-balance',
+          component: () => import('@/views/cartilla/BalanceInventarioView.vue'),
+          meta: { title: 'Cartilla Agencia - Balance de Inventario' }
         }
       ]
     },

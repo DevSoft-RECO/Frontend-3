@@ -242,6 +242,43 @@ const menuItems = computed(() => {
         })
     }
 
+    // Grupo Cartilla Ganadora
+    if (authStore.hasPermission('cartilla_mercadeo')) {
+        items.push({
+            id: 'cartilla-ganadora',
+            label: 'Cartilla Ganadora',
+            iconSvg: '<path stroke-linecap="round" stroke-linejoin="round" d="M15 5v2m0 4v2m0 4v2M5 5a2 2 0 00-2 2v3a2 2 0 110 4v3a2 2 0 002 2h14a2 2 0 002-2v-3a2 2 0 110-4V7a2 2 0 00-2-2H5z" />',
+            children: [
+                { label: 'Dashboard General', route: '/admin/cartilla-dashboard' },
+                { label: 'Registros', route: '/admin/cartilla-registros' },
+                { label: 'Pagos Automáticos', route: '/admin/cartilla-colocaciones' },
+                { label: 'Historial Registros', route: '/admin/cartilla-historial-registros' },
+                { label: 'Inventario Central', route: '/admin/cartilla-inventario' },
+                { label: 'Balance Inventario', route: '/admin/cartilla-balance' },
+                { label: 'Historial Inventario', route: '/admin/cartilla-historial-inventario' },
+                { label: 'Exportaciones', route: '/admin/cartilla-exportaciones' },
+                { label: 'Configuración', route: '/admin/cartilla-configuracion' }
+            ]
+        })
+    }
+
+    // Grupo Cartilla Ganadora agencias
+    if (authStore.hasPermission('cartilla_operativo') || authStore.hasPermission('cartilla_consultor') || authStore.hasPermission('cartilla_mercadeo') || authStore.hasRole('Super Admin')) {
+        items.push({
+            id: 'cartilla-ganadora-agencias',
+            label: 'Cartilla Ganadora agencias',
+            iconSvg: '<path stroke-linecap="round" stroke-linejoin="round" d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5m0 0h4m-4 0v-4m0 4h4" />',
+            children: [
+                { label: 'Dashboard', route: '/admin/cartilla-agencia-dashboard' },
+                { label: 'Registros', route: '/admin/cartilla-agencia-registros' },
+                { label: 'Pagos Automáticos', route: '/admin/cartilla-agencia-colocaciones' },
+                { label: 'Historial Registros', route: '/admin/cartilla-agencia-historial-registros' },
+                { label: 'Inventario', route: '/admin/cartilla-agencia-inventario' },
+                { label: 'Balance Inventario', route: '/admin/cartilla-agencia-balance' }
+            ]
+        })
+    }
+
     return items
 })
 
