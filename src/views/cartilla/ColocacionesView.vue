@@ -188,8 +188,9 @@ const modalReclamoShow = ref(false)
 const pagoSeleccionado = ref(null)
 
 const esAdminMercadeo = computed(() => {
-  return authStore.user?.roles_list?.includes('Super Admin') || 
-         authStore.user?.permissions_list?.includes('cartilla_mercadeo')
+  return authStore.hasPermission('admin_promocion') ||
+         authStore.hasPermission('cartilla_mercadeo') ||
+         authStore.hasRole('Super Admin')
 })
 
 const filtros = reactive({
