@@ -80,14 +80,16 @@ import { computed } from 'vue'
 
 const props = defineProps({
     current_page: { type: [Number, String], default: 1 },
-    last_page: { type: [Number, String], default: 1 }
+    last_page: { type: [Number, String], default: 1 },
+    currentPage: { type: [Number, String], default: null },
+    lastPage: { type: [Number, String], default: null }
 })
 
 const emit = defineEmits(['change-page'])
 
-// Aseguramos que trabajamos con números
-const currentPage = computed(() => parseInt(props.current_page) || 1)
-const totalPages = computed(() => parseInt(props.last_page) || 1)
+// Aseguramos que trabajamos con números independientemente del nombre del prop enviado
+const currentPage = computed(() => parseInt(props.currentPage ?? props.current_page) || 1)
+const totalPages = computed(() => parseInt(props.lastPage ?? props.last_page) || 1)
 
 const goToPage = (page) => {
     if (page >= 1 && page <= totalPages.value) {

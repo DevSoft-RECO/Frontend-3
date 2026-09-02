@@ -59,7 +59,6 @@ export const useCartillaRegistrosStore = defineStore('cartillaRegistros', () => 
     } catch (err) {
       console.error('Error fetching cartilla registros:', err)
       error.value = err.response?.data?.error || 'Error al obtener registros'
-      throw err
     } finally {
       loading.value = false
     }
@@ -109,6 +108,20 @@ export const useCartillaRegistrosStore = defineStore('cartillaRegistros', () => 
     }
   }
 
+  async function calcularStickersPreview(params) {
+    try {
+      const response = await api.get('/cartilla/registros/calcular-stickers', { params })
+      return response.data
+    } catch (err) {
+      console.error('Error calculando stickers:', err)
+      return { stickers: 0, mensaje: '', ya_registro_plazo_fijo: false, detalle_existente: null }
+    }
+  }
+
+  function clearCache() {
+    cacheMap.clear()
+  }
+
   return {
     registros,
     pagination,
@@ -117,6 +130,8 @@ export const useCartillaRegistrosStore = defineStore('cartillaRegistros', () => 
     fetchRegistros,
     crearRegistro,
     editarRegistro,
-    eliminarRegistro
+    eliminarRegistro,
+    calcularStickersPreview,
+    clearCache
   }
 })

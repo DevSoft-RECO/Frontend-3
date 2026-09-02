@@ -220,14 +220,24 @@ const tableHeaders = [
 const modalAbierto = ref(false)
 const registroActivo = ref(null)
 
-onMounted(() => {
-  catalogosStore.fetchAgencias()
-  catalogosStore.fetchPromocionales()
+onMounted(async () => {
+  try {
+    await Promise.all([
+      catalogosStore.fetchAgencias(),
+      catalogosStore.fetchPromocionales()
+    ])
+  } catch (e) {
+    console.error(e)
+  }
   cargar()
 })
 
-const cargar = () => {
-  registrosStore.fetchRegistros(filtros.value)
+const cargar = async () => {
+  try {
+    await registrosStore.fetchRegistros(filtros.value)
+  } catch (e) {
+    console.error('Error cargando registros de agencia:', e)
+  }
 }
 
 const cambiarPagina = (page) => {

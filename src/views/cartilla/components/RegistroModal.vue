@@ -114,6 +114,56 @@
           </div>
         </div>
 
+        <!-- PANEL DE PREVISUALIZACIÓN DE STICKERS ASIGNADOS -->
+        <div
+          v-if="form.accion"
+          class="p-4 rounded-xl border transition-all duration-300 shadow-xs"
+          :class="{
+            'bg-amber-500/10 border-amber-500/30 text-amber-900 dark:text-amber-200': previewStickers.ya_registro_plazo_fijo,
+            'bg-emerald-500/10 border-emerald-500/30 text-emerald-900 dark:text-emerald-200': !previewStickers.ya_registro_plazo_fijo && previewStickers.stickers > 0,
+            'bg-gray-100 dark:bg-gray-800 border-gray-300 dark:border-gray-700 text-gray-700 dark:text-gray-300': previewStickers.stickers === 0 && !previewStickers.ya_registro_plazo_fijo
+          }"
+        >
+          <div class="flex items-start justify-between gap-4">
+            <div class="flex items-center gap-3">
+              <div
+                class="p-2.5 rounded-xl font-black text-lg flex items-center justify-center min-w-11 h-11 border"
+                :class="{
+                  'bg-amber-500 text-white border-amber-600': previewStickers.ya_registro_plazo_fijo,
+                  'bg-emerald-600 text-white border-emerald-700': !previewStickers.ya_registro_plazo_fijo && previewStickers.stickers > 0,
+                  'bg-gray-400 text-white border-gray-500': previewStickers.stickers === 0 && !previewStickers.ya_registro_plazo_fijo
+                }"
+              >
+                <span>⭐ {{ previewStickers.stickers }}</span>
+              </div>
+              <div>
+                <p class="text-xs font-black uppercase tracking-wider opacity-80">Stickers a Asignar al Asociado</p>
+                <p class="text-sm font-bold mt-0.5">
+                  {{ previewStickers.mensaje || 'Seleccione acción y datos' }}
+                </p>
+              </div>
+            </div>
+
+            <span
+              v-if="calculandoPreview"
+              class="animate-spin text-xs text-gray-500"
+            >⌛</span>
+          </div>
+
+          <!-- Alerta de Plazo Fijo Previos en el Mismo Día -->
+          <div v-if="previewStickers.ya_registro_plazo_fijo" class="mt-3 pt-3 border-t border-amber-500/20 text-xs space-y-1">
+            <p class="font-bold flex items-center gap-1.5 text-amber-700 dark:text-amber-400">
+              <span>🚫</span> <strong>Validación de Regla de Negocio:</strong>
+            </p>
+            <p class="text-amber-800 dark:text-amber-300">
+              {{ previewStickers.detalle_existente }}
+            </p>
+            <p class="text-[11px] text-amber-600 dark:text-amber-400 italic">
+              * El sistema registrará la participación para control, pero asignará 0 stickers debido al límite de 1 Plazo Fijo por día.
+            </p>
+          </div>
+        </div>
+
         <hr class="border-gray-200 dark:border-gray-800" />
 
         <!-- Checkboxes Cartillas -->
@@ -288,24 +338,67 @@ const inicializarFormulario = () => {
   }
 }
 
-watch(() => props.show, (newVal) => {
+watch(() => props.show, async (newVal) => {
   if (newVal) {
-    catalogosStore.fetchPromocionales()
-    catalogosStore.fetchNotasRapidas()
-    catalogosStore.fetchAgencias().then(() => {
-      inicializarFormulario()
-    })
+    try {
+      await Promise.all([
+        catalogosStore.fetchPromocionales(),
+        catalogosStore.fetchNotasRapidas(),
+        catalogosStore.fetchAgencias()
+      ])
+    } catch (e) {
+      console.error(e)
+    }
     inicializarFormulario()
   }
 })
 
-onMounted(() => {
-  catalogosStore.fetchPromocionales()
-  catalogosStore.fetchNotasRapidas()
-  catalogosStore.fetchAgencias()
+onMounted(async () => {
+  try {
+    await Promise.all([
+      catalogosStore.fetchPromocionales(),
+      catalogosStore.fetchNotasRapidas(),
+      catalogosStore.fetchAgencias()
+    ])
+  } catch (e) {
+    console.error(e)
+  }
   if (props.show) {
     inicializarFormulario()
   }
+})
+
+const calculandoPreview = ref(false)
+const previewStickers = ref({
+  stickers: 0,
+  mensaje: '',
+  ya_registro_plazo_fijo: false,
+  detalle_existente: null
+})
+
+const consultarStickers = async () => {
+  if (!form.value.accion) {
+    previewStickers.value = { stickers: 0, mensaje: '', ya_registro_plazo_fijo: false, detalle_existente: null }
+    return
+  }
+
+  calculandoPreview.value = true
+  try {
+    const res = await registrosStore.calcularStickersPreview({
+      codigo_cliente: form.value.codigo_cliente,
+      accion: form.value.accion,
+      tipo_operacion: form.value.tipo_operacion
+    })
+    previewStickers.value = res
+  } catch (e) {
+    console.error(e)
+  } finally {
+    calculandoPreview.value = false
+  }
+}
+
+watch([() => form.value.accion, () => form.value.tipo_operacion, () => form.value.codigo_cliente], () => {
+  consultarStickers()
 })
 
 const onChangeAccion = () => {
@@ -326,6 +419,7 @@ const onChangeAccion = () => {
   } else {
     opcionesOperacion.value = []
   }
+  consultarStickers()
 }
 
 const seleccionarNotaRapida = (e) => {
