@@ -143,7 +143,8 @@ const colocacionesStore = useColocacionesStore()
 const authStore = useAuthStore()
 
 const puedeEditar = computed(() => {
-  return authStore.hasPermission('edicion_promocion_agencia') ||
+  return authStore.hasPermission('admin_promocion') ||
+         authStore.hasPermission('edicion_promocion_agencia') ||
          authStore.hasPermission('cartilla_operativo') ||
          authStore.hasPermission('cartilla_mercadeo') ||
          authStore.hasRole('Super Admin')
