@@ -232,6 +232,27 @@ router.beforeEach(async (to, from, next) => {
 
     // Verificar Permiso único
     if (to.meta.permission && !authStore.hasPermission(to.meta.permission)) {
+      
+      // Auto-enrutamiento dinámico si falla al entrar a la página principal
+      if (to.path === '/admin/dashboard') {
+        const availableRoutes = router.getRoutes().filter(r => r.path.startsWith('/admin/') && r.path !== '/admin/dashboard');
+        
+        for (const route of availableRoutes) {
+          // Evaluar permiso único
+          if (route.meta.permission && authStore.hasPermission(route.meta.permission)) {
+            console.warn(`Redireccionando a ruta permitida: ${route.path}`);
+            return next(route.path);
+          }
+          // Evaluar permisos multiples (permissionsAny)
+          if (route.meta.permissionsAny && Array.isArray(route.meta.permissionsAny)) {
+            if (route.meta.permissionsAny.some(p => authStore.hasPermission(p))) {
+              console.warn(`Redireccionando a ruta permitida: ${route.path}`);
+              return next(route.path);
+            }
+          }
+        }
+      }
+
       const motherAppUrl = import.meta.env.VITE_MOTHER_APP_URL || 'http://localhost:5173';
       console.warn(`⛔ Acceso denegado: Usuario no tiene el permiso '${to.meta.permission}'. Redirigiendo a App Madre...`);
       window.location.href = `${motherAppUrl}/apps`;
