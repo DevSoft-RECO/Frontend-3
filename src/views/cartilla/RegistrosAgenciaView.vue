@@ -31,7 +31,7 @@
             class="w-full px-3 py-2 bg-gray-50 dark:bg-gray-800 border border-gray-300 dark:border-gray-700 rounded-xl text-sm text-gray-900 dark:text-white focus:outline-hidden focus:ring-2 focus:ring-emerald-500"
           >
             <option value="">Todas las acciones</option>
-            <option value="CREDITO_NUEVO">Crédito Nuevo</option>
+            <option value="CREDITO_NUEVO">Crédito</option>
             <option value="PLAZO_FIJO">Plazo Fijo</option>
             <option value="MOTOCICLETA">Motocicleta</option>
             <option value="PAGO_PUNTUAL">Pago Puntual</option>
@@ -298,7 +298,7 @@ const eliminarRegistro = async (registro) => {
 
 const getAccionLabel = (accion) => {
   const labels = {
-    CREDITO_NUEVO: 'Crédito Nuevo',
+    CREDITO_NUEVO: 'Crédito',
     PLAZO_FIJO: 'Plazo Fijo',
     MOTOCICLETA: 'Motocicleta',
     PAGO_PUNTUAL: 'Pago Puntual'

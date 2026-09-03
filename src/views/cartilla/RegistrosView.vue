@@ -45,7 +45,7 @@
             class="w-full bg-white dark:bg-gray-800 border border-gray-300 dark:border-gray-700 rounded-xl px-4 py-2 text-gray-900 dark:text-white text-sm"
           >
             <option value="">Todas las acciones</option>
-            <option value="CREDITO_NUEVO">Crédito Nuevo</option>
+            <option value="CREDITO_NUEVO">Crédito</option>
             <option value="PLAZO_FIJO">Plazo Fijo</option>
             <option value="MOTOCICLETA">Motocicleta</option>
             <option value="PAGO_PUNTUAL">Pago Puntual</option>
@@ -332,7 +332,7 @@ const confirmarEliminar = async (id) => {
 // Helpers visuales
 const getAccionLabel = (a) => {
   const labels = {
-    'CREDITO_NUEVO': 'Crédito Nuevo',
+    'CREDITO_NUEVO': 'Crédito',
     'PLAZO_FIJO': 'Plazo Fijo',
     'MOTOCICLETA': 'Motocicleta',
     'PAGO_PUNTUAL': 'Pago Puntual'

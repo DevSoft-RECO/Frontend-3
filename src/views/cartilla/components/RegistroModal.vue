@@ -52,7 +52,7 @@
               @change="onChangeAccion"
             >
               <option value="">Seleccione Acción...</option>
-              <option value="CREDITO_NUEVO">Crédito Nuevo</option>
+              <option value="CREDITO_NUEVO">Crédito</option>
               <option value="PLAZO_FIJO">Plazo Fijo</option>
               <option value="MOTOCICLETA">Motocicleta</option>
               <option value="PAGO_PUNTUAL">Pago Puntual</option>
@@ -433,10 +433,23 @@ const seleccionarNotaRapida = (e) => {
 const guardar = async () => {
   errorMsg.value = ''
 
+  const isMotoAlContado = form.value.accion === 'MOTOCICLETA' && form.value.tipo_operacion === 'AL CONTADO'
+
   if (!form.value.agencia_id) return errorMsg.value = 'Debe seleccionar una agencia.'
-  if (!form.value.codigo_cliente) return errorMsg.value = 'Debe ingresar el código del cliente.'
+  
+  if (!isMotoAlContado) {
+    if (!form.value.codigo_cliente || form.value.codigo_cliente.length < 5) {
+      return errorMsg.value = 'El Código Cliente es obligatorio y debe tener al menos 5 dígitos.'
+    }
+    if (!form.value.numero_cuenta || form.value.numero_cuenta.length !== 15) {
+      return errorMsg.value = 'El Número de Cuenta es obligatorio y debe tener exactamente 15 dígitos.'
+    }
+  }
+
   if (!form.value.accion) return errorMsg.value = 'Debe seleccionar una acción participante.'
-  if (!form.value.monto || parseFloat(form.value.monto) <= 0) return errorMsg.value = 'Debe ingresar un monto válido.'
+  if (!form.value.monto || parseFloat(form.value.monto) <= 0) {
+    return errorMsg.value = 'El Monto es obligatorio y debe ser mayor a 0.'
+  }
 
   try {
     if (isEdit.value) {
