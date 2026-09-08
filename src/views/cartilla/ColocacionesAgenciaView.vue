@@ -20,7 +20,20 @@
 
     <!-- Filtros de Búsqueda -->
     <div class="p-6 bg-white dark:bg-gray-900 border border-gray-200 dark:border-gray-800 rounded-2xl shadow-xl space-y-4">
-      <div class="grid grid-cols-1 sm:grid-cols-3 gap-4">
+      <div class="grid grid-cols-1 sm:grid-cols-4 gap-4">
+        <div>
+          <label class="block text-xs font-bold text-gray-700 dark:text-gray-300 uppercase mb-1">Estado</label>
+          <select
+            v-model="filtros.estado"
+            @change="buscar"
+            class="w-full px-3 py-2 bg-gray-50 dark:bg-gray-800 border border-gray-300 dark:border-gray-700 rounded-xl text-sm text-gray-900 dark:text-white focus:outline-hidden focus:ring-2 focus:ring-emerald-500"
+          >
+            <option value="PENDIENTE">Pendientes</option>
+            <option value="RECLAMADO">Reclamados</option>
+            <option value="">Todos</option>
+          </select>
+        </div>
+
         <div>
           <label class="block text-xs font-bold text-gray-700 dark:text-gray-300 uppercase mb-1">ID Asociado</label>
           <input
@@ -65,48 +78,56 @@
           @click="buscar"
           class="px-4 py-2 bg-emerald-600 hover:bg-emerald-500 text-white font-bold rounded-xl text-xs cursor-pointer"
         >
-          Buscar
+          🔍 Buscar
         </button>
       </div>
     </div>
 
-    <!-- Tabla de Pagos Pendientes -->
+    <!-- Tabla Resultados -->
     <div class="bg-white dark:bg-gray-900 border border-gray-200 dark:border-gray-800 rounded-2xl shadow-xl overflow-hidden">
       <BaseTable
         :columns="tableColumns"
         :rows="colocacionesStore.pendientes"
         :loading="colocacionesStore.loading"
       >
+        <template #cell-fecha_pago="{ row }">
+          <div class="text-sm font-bold text-gray-900 dark:text-white">
+            {{ formatearFechaTabla(row.fecha_pago) }}
+          </div>
+          <div class="text-xs text-gray-500 dark:text-gray-400">
+            Sugerida: {{ formatearFechaTabla(row.fecha_sugerida_pago) }}
+          </div>
+        </template>
+
         <template #cell-agencia="{ row }">
-          <span class="font-bold text-gray-900 dark:text-white text-xs">{{ row.agencia?.nombre || '-' }}</span>
-        </template>
-
-        <template #cell-codigo_cliente="{ row }">
-          <span class="font-mono text-gray-700 dark:text-gray-300 font-bold text-xs">{{ row.codigo_cliente }}</span>
-        </template>
-
-        <template #cell-numero_cuenta="{ row }">
-          <span class="font-mono text-gray-600 dark:text-gray-400 text-xs">{{ row.numero_cuenta }}</span>
-        </template>
-
-        <template #cell-monto="{ row }">
-          <span class="font-bold text-emerald-600 dark:text-emerald-400 text-xs">
-            Q {{ Number(row.monto).toLocaleString('es-GT', { minimumFractionDigits: 2 }) }}
+          <span class="text-xs font-semibold text-gray-700 dark:text-gray-300">
+            {{ row.agencia?.nombre || 'N/A' }}
           </span>
         </template>
 
-        <template #cell-fecha_pago="{ row }">
-          <span class="text-xs text-gray-600 dark:text-gray-400">{{ formatearFechaTabla(row.fecha_pago) }}</span>
+        <template #cell-codigo_cliente="{ row }">
+          <span class="font-mono text-sm font-bold text-gray-900 dark:text-white">{{ row.codigo_cliente }}</span>
+        </template>
+
+        <template #cell-numero_cuenta="{ row }">
+          <span class="font-mono text-xs text-gray-500 dark:text-gray-400">{{ row.numero_cuenta }}</span>
+        </template>
+
+        <template #cell-monto="{ row }">
+          <span class="font-bold text-emerald-600 dark:text-emerald-400">Q {{ parseFloat(row.monto).toLocaleString('es-GT', {minimumFractionDigits: 2}) }}</span>
         </template>
 
         <template #cell-acciones="{ row }">
           <button
-            v-if="puedeEditar"
+            v-if="puedeEditar && row.estado === 'PENDIENTE'"
             @click="abrirReclamo(row)"
             class="px-3 py-1.5 bg-emerald-600 hover:bg-emerald-500 text-white font-bold rounded-lg text-xs cursor-pointer flex items-center gap-1"
           >
             <span>✨</span> Reclamar
           </button>
+          <span v-else-if="row.estado === 'RECLAMADO'" class="px-2 py-1 bg-gray-100 text-gray-500 dark:bg-gray-800 dark:text-gray-400 font-bold text-xs rounded-lg border border-gray-300 dark:border-gray-700 flex items-center w-fit gap-1 ml-auto">
+            ✓ Ya Reclamado
+          </span>
           <span v-else class="text-xs text-gray-400 font-semibold italic">Solo lectura</span>
         </template>
       </BaseTable>
@@ -154,6 +175,7 @@ const modalReclamoShow = ref(false)
 const pagoSeleccionado = ref(null)
 
 const filtros = reactive({
+  estado: 'PENDIENTE',
   codigo_cliente: '',
   numero_cuenta: '',
   fecha_pago: '',
