@@ -20,20 +20,7 @@
 
     <!-- Filtros de Búsqueda -->
     <div class="p-6 bg-white dark:bg-gray-900 border border-gray-200 dark:border-gray-800 rounded-2xl shadow-xl space-y-4">
-      <div class="grid grid-cols-1 sm:grid-cols-4 gap-4">
-        <div>
-          <label class="block text-xs font-bold text-gray-700 dark:text-gray-300 uppercase mb-1">Estado</label>
-          <select
-            v-model="filtros.estado"
-            @change="buscar"
-            class="w-full px-3 py-2 bg-gray-50 dark:bg-gray-800 border border-gray-300 dark:border-gray-700 rounded-xl text-sm text-gray-900 dark:text-white focus:outline-hidden focus:ring-2 focus:ring-emerald-500"
-          >
-            <option value="PENDIENTE">Pendientes</option>
-            <option value="RECLAMADO">Reclamados</option>
-            <option value="">Todos</option>
-          </select>
-        </div>
-
+      <div class="grid grid-cols-1 sm:grid-cols-3 gap-4">
         <div>
           <label class="block text-xs font-bold text-gray-700 dark:text-gray-300 uppercase mb-1">ID Asociado</label>
           <input
@@ -119,15 +106,12 @@
 
         <template #cell-acciones="{ row }">
           <button
-            v-if="puedeEditar && row.estado === 'PENDIENTE'"
+            v-if="puedeEditar"
             @click="abrirReclamo(row)"
             class="px-3 py-1.5 bg-emerald-600 hover:bg-emerald-500 text-white font-bold rounded-lg text-xs cursor-pointer flex items-center gap-1"
           >
             <span>✨</span> Reclamar
           </button>
-          <span v-else-if="row.estado === 'RECLAMADO'" class="px-2 py-1 bg-gray-100 text-gray-500 dark:bg-gray-800 dark:text-gray-400 font-bold text-xs rounded-lg border border-gray-300 dark:border-gray-700 flex items-center w-fit gap-1 ml-auto">
-            ✓ Ya Reclamado
-          </span>
           <span v-else class="text-xs text-gray-400 font-semibold italic">Solo lectura</span>
         </template>
       </BaseTable>
@@ -175,7 +159,6 @@ const modalReclamoShow = ref(false)
 const pagoSeleccionado = ref(null)
 
 const filtros = reactive({
-  estado: 'PENDIENTE',
   codigo_cliente: '',
   numero_cuenta: '',
   fecha_pago: '',
