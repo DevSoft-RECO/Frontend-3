@@ -64,6 +64,7 @@
             <label class="block text-xs font-bold text-gray-500 dark:text-gray-400 uppercase tracking-wider mb-1.5">Tipo Operación</label>
             <select
               v-model="form.tipo_operacion"
+              @change="onChangeOperacion"
               class="w-full bg-white dark:bg-gray-800 border border-gray-300 dark:border-gray-700 rounded-xl px-4 py-2.5 text-gray-900 dark:text-white text-sm"
               :disabled="!form.accion"
             >
@@ -91,7 +92,7 @@
               
               <!-- Contador de Caracteres -->
               <span
-                v-if="form.numero_cuenta && form.accion !== 'MOTOCICLETA'"
+                v-if="form.numero_cuenta && !(form.accion === 'MOTOCICLETA' && form.tipo_operacion === 'AL CONTADO')"
                 class="px-2 py-0.5 rounded-md text-[11px] font-mono font-bold transition-all"
                 :class="{
                   'bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 border border-emerald-500/20': form.numero_cuenta.length === 15,
@@ -108,7 +109,7 @@
               type="text"
               v-model="form.numero_cuenta"
               placeholder="126..."
-              :disabled="form.accion === 'MOTOCICLETA'"
+              :disabled="form.accion === 'MOTOCICLETA' && form.tipo_operacion === 'AL CONTADO'"
               class="w-full bg-white dark:bg-gray-800 border border-gray-300 dark:border-gray-700 rounded-xl px-4 py-2.5 text-gray-900 dark:text-white text-sm font-mono"
             />
           </div>
@@ -412,12 +413,19 @@ const onChangeAccion = () => {
   } else if (form.value.accion === 'MOTOCICLETA') {
     opcionesOperacion.value = ['FINANCIADA', 'AL CONTADO']
     form.value.tipo_operacion = 'FINANCIADA'
-    form.value.numero_cuenta = '' // Sin cuenta para motos
   } else if (form.value.accion === 'PAGO_PUNTUAL') {
     opcionesOperacion.value = ['PRESENCIAL']
     form.value.tipo_operacion = 'PRESENCIAL'
   } else {
     opcionesOperacion.value = []
+  }
+  consultarStickers()
+}
+
+const onChangeOperacion = () => {
+  if (form.value.accion === 'MOTOCICLETA' && form.value.tipo_operacion === 'AL CONTADO') {
+    form.value.numero_cuenta = ''
+    form.value.codigo_cliente = ''
   }
   consultarStickers()
 }
