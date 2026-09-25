@@ -476,7 +476,23 @@ const guardar = async () => {
     emit('saved')
     emit('close')
   } catch (err) {
-    errorMsg.value = err || 'Ocurrió un error al persistir los datos'
+    let msg = err?.response?.data?.message || err?.response?.data?.error || err?.message || 'Ocurrió un error al persistir los datos';
+    if (err?.response?.status === 422 && err?.response?.data?.errors) {
+      const firstError = Object.values(err.response.data.errors)[0];
+      msg = Array.isArray(firstError) ? firstError[0] : firstError;
+    }
+    errorMsg.value = msg;
+    
+    // Si el error es de stock o algo crítico, mostrar SweetAlert para mayor visibilidad
+    if (msg.toLowerCase().includes('inventario') || msg.toLowerCase().includes('insuficiente') || err?.response?.status === 500) {
+      Swal.fire({
+        title: 'Error de Validación o Stock',
+        text: msg,
+        icon: 'warning',
+        background: '#1f2937',
+        color: '#fff'
+      });
+    }
   }
 }
 </script>
