@@ -20,6 +20,13 @@
         </button>
         <button
           v-if="puedeEditar"
+          @click="modalExtraordinarioShow = true"
+          class="px-4 py-2 bg-amber-600 hover:bg-amber-500 text-white font-bold rounded-xl text-sm cursor-pointer flex items-center gap-2 shadow-lg shadow-amber-900/20"
+        >
+          <span>🎁</span> Entrega Extraordinaria
+        </button>
+        <button
+          v-if="puedeEditar"
           @click="modalReposicionShow = true"
           class="px-4 py-2 bg-emerald-600 hover:bg-emerald-500 text-white font-bold rounded-xl text-sm cursor-pointer flex items-center gap-2 shadow-lg shadow-emerald-900/20"
         >
@@ -148,6 +155,14 @@
       @close="modalReposicionShow = false"
       @success="cargar"
     />
+
+    <!-- Modal Entrega Extraordinaria -->
+    <EntregaExtraordinariaModal
+      :show="modalExtraordinarioShow"
+      :stock="miStockAgencia"
+      @close="modalExtraordinarioShow = false"
+      @success="cargar"
+    />
   </div>
 </template>
 
@@ -158,6 +173,7 @@ import { useAuthStore } from '@/stores/auth'
 import BaseTable from '@/components/ui/BaseTable.vue'
 import BasePagination from '@/components/ui/BasePagination.vue'
 import ReposicionCartillaModal from './components/ReposicionCartillaModal.vue'
+import EntregaExtraordinariaModal from './components/EntregaExtraordinariaModal.vue'
 
 const inventarioStore = useCartillaInventarioStore()
 const authStore = useAuthStore()
@@ -171,6 +187,7 @@ const puedeEditar = computed(() => {
 })
 
 const modalReposicionShow = ref(false)
+const modalExtraordinarioShow = ref(false)
 
 const tableHeaders = [
   { key: 'codigo', label: 'Código' },
