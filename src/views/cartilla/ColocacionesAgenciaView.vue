@@ -104,6 +104,24 @@
           <span class="font-bold text-emerald-600 dark:text-emerald-400">Q {{ parseFloat(row.monto).toLocaleString('es-GT', {minimumFractionDigits: 2}) }}</span>
         </template>
 
+        <template #cell-llamada="{ row }">
+          <button
+            v-if="puedeEditar"
+            @click="abrirLlamada(row)"
+            class="px-3 py-1.5 font-bold rounded-lg text-xs cursor-pointer flex items-center gap-1 transition-colors whitespace-nowrap border"
+            :class="{
+              'bg-blue-600 hover:bg-blue-500 text-white border-transparent': !row.llamadas || row.llamadas.length === 0,
+              'bg-amber-100 text-amber-700 hover:bg-amber-200 border-amber-300': row.llamadas?.length > 0 && row.llamadas[0].estado === 'Pendiente',
+              'bg-red-100 text-red-700 hover:bg-red-200 border-red-300': row.llamadas?.length > 0 && row.llamadas[0].estado === 'No contesta',
+              'bg-emerald-100 text-emerald-700 hover:bg-emerald-200 border-emerald-300': row.llamadas?.length > 0 && row.llamadas[0].estado === 'Completada',
+            }"
+          >
+            <span>📞</span> 
+            <span v-if="!row.llamadas || row.llamadas.length === 0">Llamar</span>
+            <span v-else>{{ row.llamadas[0].estado }}</span>
+          </button>
+        </template>
+
         <template #cell-acciones="{ row }">
           <button
             v-if="puedeEditar"
@@ -133,6 +151,14 @@
       @close="modalReclamoShow = false"
       @success="buscar"
     />
+
+    <!-- Modal Llamada -->
+    <LlamadaModal
+      :show="modalLlamadaShow"
+      :pago="pagoSeleccionado"
+      @close="modalLlamadaShow = false"
+      @saved="onLlamadaSaved"
+    />
   </div>
 </template>
 
@@ -143,6 +169,8 @@ import { useAuthStore } from '@/stores/auth'
 import BaseTable from '@/components/ui/BaseTable.vue'
 import BasePagination from '@/components/ui/BasePagination.vue'
 import ReclamarModal from './components/ReclamarModal.vue'
+import LlamadaModal from './components/LlamadaModal.vue'
+import Swal from 'sweetalert2'
 
 const colocacionesStore = useColocacionesStore()
 const authStore = useAuthStore()
@@ -156,6 +184,7 @@ const puedeEditar = computed(() => {
 })
 
 const modalReclamoShow = ref(false)
+const modalLlamadaShow = ref(false)
 const pagoSeleccionado = ref(null)
 
 const filtros = reactive({
@@ -170,6 +199,7 @@ const tableColumns = [
   { key: 'codigo_cliente', label: 'ID Asociado' },
   { key: 'numero_cuenta', label: 'No. Cuenta' },
   { key: 'monto', label: 'Monto' },
+  { key: 'llamada', label: 'Llamada' },
   { key: 'acciones', label: 'Acciones', class: 'text-right' },
 ]
 
@@ -200,5 +230,23 @@ const limpiarFiltros = () => {
 const abrirReclamo = (pago) => {
   pagoSeleccionado.value = pago
   modalReclamoShow.value = true
+}
+
+const abrirLlamada = (pago) => {
+  pagoSeleccionado.value = pago
+  modalLlamadaShow.value = true
+}
+
+const onLlamadaSaved = () => {
+  buscar()
+  Swal.fire({
+    title: '¡Llamada Registrada!',
+    text: 'El estado de la llamada se guardó correctamente.',
+    icon: 'success',
+    toast: true,
+    position: 'top-end',
+    showConfirmButton: false,
+    timer: 3000
+  })
 }
 </script>

@@ -81,6 +81,24 @@
           <span v-else>📥</span> Descargar CSV Historial Kárdex
         </button>
       </div>
+
+      <!-- Tarjeta 5: Llamadas -->
+      <div class="p-6 bg-white dark:bg-gray-900 border border-gray-200 dark:border-gray-800 rounded-2xl shadow-xl flex flex-col justify-between">
+        <div>
+          <h3 class="text-lg font-bold text-gray-900 dark:text-white mb-2">Llamadas (Pagos Automáticos)</h3>
+          <p class="text-sm text-gray-500 dark:text-gray-400">
+            Exportación de llamadas de seguimiento a los asociados.
+          </p>
+        </div>
+        <button
+          @click="descargar('/cartilla/exportar/llamadas', 'cartilla_llamadas')"
+          :disabled="cargando['/cartilla/exportar/llamadas']"
+          class="mt-6 w-full py-2.5 bg-emerald-600 hover:bg-emerald-500 font-bold text-white rounded-xl text-sm cursor-pointer flex items-center justify-center gap-2 disabled:opacity-50"
+        >
+          <span v-if="cargando['/cartilla/exportar/llamadas']" class="animate-spin text-sm">⌛</span>
+          <span v-else>📥</span> Descargar CSV Llamadas
+        </button>
+      </div>
     </div>
   </div>
 </template>
